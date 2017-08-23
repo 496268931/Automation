@@ -235,7 +235,7 @@ def main():
 
             # 点击注册
             driver.find_element_by_xpath('//*[@id="widget-userregistlogin"]/div[3]/div[3]/a').click()
-            time.sleep(6)
+            time.sleep(20)
 
             driver.switch_to.frame('login_frame')
             time.sleep(5)
@@ -281,6 +281,7 @@ def main():
             driver.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div/div/div/a[2]').click()
             time.sleep(1)
 
+            '''
             f = open('qiy_account.txt', 'a')
             # f.write('token:'+token)
             # f.write('\n')
@@ -290,6 +291,7 @@ def main():
             f.write('\n')
             f.write('\n')
             f.close()
+            '''
 
             addCount(phone)
             print('手机号' + phone + '注册成功')

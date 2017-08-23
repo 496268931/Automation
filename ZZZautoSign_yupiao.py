@@ -93,6 +93,9 @@ def getMessage(token, phone):
         addCount(phone)
 
         print('手机号' + phone + '注册成功')
+
+        time.sleep(2)
+        black(token,phone)
         # print(phone)
         # print('abc'+phone)
         # driver.quit()
@@ -215,6 +218,6 @@ if __name__ == '__main__':
             print(e)
             print('该手机号已注册过或注册过程发生异常，本次注册取消')
         finally:
-            black(token,phone)
+
             print('---分割线---')
             driver.quit()

@@ -127,6 +127,6 @@ def main(taskUrl, accountId, password, content):
 
 
 if __name__ == '__main__':
-    main('http://v.youku.com/v_show/id_XMjk0MDAwOTc1Ng==.html?spm=a2hzp.8244740.0.0'
-         '~5!2~A', '17097352190', 'abc17097352190', u'超级无敌喜欢这部剧')
+    main('http://v.youku.com/v_show/id_XMTU2ODY2NjYyOA==.html?spm=a2h0j.8191423.module_basic_relation.5~5!2~5~5!24~5~5~A'
+         '~5!2~A', '13434843854', 'abc13434843854', u'超级无敌喜欢这部剧')
 

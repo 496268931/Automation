@@ -90,7 +90,7 @@ def getMessage(token, phone, driver):
 
     print(data)
     int = data.find('您的验证码为')
-    # print(int)
+    print(int)
 
     if int == -1:
 
@@ -99,15 +99,28 @@ def getMessage(token, phone, driver):
         driver.quit()
 
 
-    else:
+    elif int == 30:
+        #int=30
+        #MSG&【AcFun弹幕视频网】您的验证码为：573650。一起加入弹幕的世界，AC娘等你来玩哦(＾o＾)丿验证码5分钟内有效。[来自:1069044322656]
 
         yanzhengma = data.decode('UTF-8')[int - 7:int + -1]
-        # print(yanzhengma)
+        print(yanzhengma)
 
 
         # 输入短信验证码
         driver.find_element_by_xpath('//*[@id="ipt-mobile-code"]').send_keys(yanzhengma)
         time.sleep(2)
+    else:
+        #int=4
+        #MSG&您的验证码为：269863。一起加入弹幕的世界，AC娘等你来玩哦(＾o＾)丿验证码5分钟内有效。【AcFun弹幕视频网】[来自:106901402656]
+        yanzhengma = data.decode('UTF-8')[int + 7:int + 13]
+        print(yanzhengma)
+
+
+        # 输入短信验证码
+        driver.find_element_by_xpath('//*[@id="ipt-mobile-code"]').send_keys(yanzhengma)
+        time.sleep(2)
+
 
 
 def addCount(token, phone):
@@ -290,6 +303,10 @@ def main():
 
                 driver.find_element_by_xpath('//*[@id="popupCode"]').send_keys(yanzhengma)
                 time.sleep(2)
+                os.remove(picName)
+                time.sleep(2)
+                os.remove(picNameCut)
+                time.sleep(2)
 
                 # 点击确定
                 driver.find_element_by_xpath(
@@ -310,18 +327,25 @@ def main():
             time.sleep(5)
             driver.find_element_by_xpath('//*[@id="form-reg"]/div[7]/a').click()
             time.sleep(8)
-            addCount(token, phone)
-            time.sleep(1)
-            print('手机号' + phone + '注册成功')
-            driver.quit()
+
+            if not isElementExist('//*[@id="form-reg"]/div[7]/a', driver):
+
+                addCount(token, phone)
+                time.sleep(1)
+                print('手机号' + phone + '注册成功')
+                black(token, phone)
+            else:
+                print('注册有误，退出')
+
         except Exception as e:
             print(e)
-            driver.quit()
+
         finally:
-            black(token, phone)
+
             print('已将该号码拉入黑名单')
             print('本次注册结束')
             print('---------我是分割线------------')
+            driver.quit()
 
 
 

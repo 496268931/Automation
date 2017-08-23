@@ -142,7 +142,7 @@ def getMessage(token,phone,driver):
         if driver.find_element_by_xpath('//*[@id="YT-regFrame-main"]/div[1]/div[3]').is_displayed():
             print('该账号已注册过或验证码有问题，本次注册失败')
         else:
-
+            '''
             f = open('youku_account.txt', 'a')
             # f.write('token:'+token)
             # f.write('\n')
@@ -152,7 +152,7 @@ def getMessage(token,phone,driver):
             f.write('\n')
             f.write('\n')
             f.close()
-
+            '''
 
             time.sleep(3)
             #nickName=driver.find_element_by_xpath('//*[@id="uerCenter"]/div[1]/div[2]/div/div[1]/div/div[1]/div[2]/div[1]/a[1]').text

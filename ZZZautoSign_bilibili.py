@@ -242,9 +242,17 @@ def main():
                     print(yanzhengma)
                     time.sleep(2)
 
+
+
                     driver.find_element_by_xpath(
                         '//*[@id="login-app"]/div/div/div[3]/div/div/div[2]/div[1]/input').send_keys(
                         yanzhengma)
+                    time.sleep(2)
+
+
+                    os.remove(picName)
+                    time.sleep(2)
+                    os.remove(picNameCut)
                     time.sleep(2)
 
                     # 点击确定
@@ -309,15 +317,18 @@ def main():
             addCount(token, phone)
             time.sleep(1)
             print('手机号' + phone + '注册成功')
-            driver.quit()
+            time.sleep(2)
+            black(token, phone)
+
         except Exception as e:
             print(e)
-            driver.quit()
+
         finally:
-            black(token, phone)
+
             print('已将该号码拉入黑名单')
             print('本次注册结束')
             print('---------我是分割线------------')
+            driver.quit()
 
 
 

@@ -472,6 +472,6 @@ def main(taskUrl, accountId, password, content):
 if __name__ == '__main__':
     # http://www.iqiyi.com/v_19rr769c4s.html#vfrm=3-2-0-0
     main('http://www.iqiyi.com/v_19rrh3jnsj.html#curid=231814007_9191801d47496d7ad349a41fa4f9a4d9',
-         '13175802439', 'abc13175802439',
-         u'超级无敌喜欢这部剧啊啊啊啊啊啊')
+         '17156648992', 'abc17156648992',
+         u'我也渴望爱情，希望找个爱我的人')
 
