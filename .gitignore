@@ -179,3 +179,5 @@ logs/
 
 geckodriver.log
 com/*
+youku_account.txt
+qiy_account.txt
