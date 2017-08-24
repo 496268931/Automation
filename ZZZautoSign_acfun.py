@@ -334,6 +334,7 @@ def main():
                 time.sleep(1)
                 print('手机号' + phone + '注册成功')
                 black(token, phone)
+                print('已将该号码拉入黑名单')
             else:
                 print('注册有误，退出')
 
@@ -342,7 +343,7 @@ def main():
 
         finally:
 
-            print('已将该号码拉入黑名单')
+
             print('本次注册结束')
             print('---------我是分割线------------')
             driver.quit()

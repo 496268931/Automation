@@ -80,7 +80,7 @@ def getPhone(token):
 
 
 
-def getMessage(token, phone,driver):
+def getMessage(token, phone, driver):
     #MSG&【格瓦拉】371598(格瓦拉注册动态码，请勿泄漏)，30分钟内有效；非本人或授权操作，请致电1010-1068
 
     url = 'http://api.tianma168.com/tm/getMessage?token=' + token + '&itemId=293&phone=' + phone + '&Code=UTF8'
@@ -96,7 +96,7 @@ def getMessage(token, phone,driver):
 
 
         print('接收验证码失败，该号码已拉入黑名单')
-        driver.quit()
+
     else:
 
         yanzhengma = data.decode('UTF-8')[int + 2:int + 8]
@@ -153,7 +153,7 @@ def addCount(phone):
 
 
 #   该方法用来确认元素是否存在，如果存在返回flag=true，否则返回false
-def isElementExist(element,driver):
+def isElementExist(element, driver):
     flag = True
 
     try:
@@ -178,7 +178,7 @@ def black(token, phone):
     print(z_data)
 
 def main():
-    for num in range(1, 51):
+    for num in range(1, 2):
         try:
             print(num)
             # 格式化成2016-03-20 11:45:39形式
@@ -218,66 +218,89 @@ def main():
             driver.find_element_by_xpath('//*[@id="mobile"]').send_keys(phone)
             time.sleep(2)
 
-            picName = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '',
+            i = 0
+            while i < 11:
+                driver.find_element_by_xpath('//*[@id="captchaMobileInput"]').clear()
+
+                picName = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '',
                                                    str(datetime.datetime.now())) + '.png'
-            driver.save_screenshot(picName)
-            time.sleep(1)
+                driver.save_screenshot(picName)
+                time.sleep(1)
 
-            # 裁切图片
-            img = Image.open(picName)
-            region = (920, 168, 1000, 208)
-            cropImg = img.crop(region)
+                # 裁切图片
+                img = Image.open(picName)
+                region = (920, 168, 1000, 208)
+                cropImg = img.crop(region)
 
-            # 保存裁切后的图片
-            picNameCut = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '',
+                # 保存裁切后的图片
+                picNameCut = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '',
                                                       str(datetime.datetime.now())) + '.png'
-            cropImg.save(picNameCut)
-            time.sleep(2)
+                cropImg.save(picNameCut)
+                time.sleep(2)
 
-            # 进行验证码验证
-            f = open(picNameCut, 'rb')
-            b_64 = base64.b64encode(f.read())
-            f.close()
-            req = showapi.ShowapiRequest("http://ali-checkcode.showapi.com/checkcode",
+                # 进行验证码验证
+                f = open(picNameCut, 'rb')
+                b_64 = base64.b64encode(f.read())
+                f.close()
+                req = showapi.ShowapiRequest("http://ali-checkcode.showapi.com/checkcode",
                                  "4e5510e696c748ca8d5033dd595bfbbc")
-            json_res = req.addTextPara("typeId", "3040") \
-                .addTextPara("img_base64", b_64) \
-                .addTextPara("convert_to_jpg", "1") \
-                .post()
+                json_res = req.addTextPara("typeId", "3040") \
+                    .addTextPara("img_base64", b_64) \
+                    .addTextPara("convert_to_jpg", "1") \
+                    .post()
 
-            # print ('1')
-            # print ('json_res data is:', json_res)
-            print (json_res)
+                # print ('1')
+                # print ('json_res data is:', json_res)
+                print (json_res)
 
             # str="{\"showapi_res_code\":0,\"showapi_res_error\":\"\",\"showapi_res_body\":{\"Result\":\"28ht\",\"ret_code\":0,\"Id\":\"adb1c363-d566-48a6-820e-55859428599d\"}}"
 
-            int = json_res.find('Result')
-            yanzhengma = json_res[int + 11:int + 15]
-            #print(yanzhengma)
+                int = json_res.find('Result')
+                yanzhengma = json_res[int + 11:int + 15]
+                print(yanzhengma)
 
 
-            driver.find_element_by_xpath('//*[@id="captchaMobileInput"]').send_keys(yanzhengma)
+                driver.find_element_by_xpath('//*[@id="captchaMobileInput"]').send_keys(yanzhengma)
 
-            time.sleep(1)
+                time.sleep(1)
 
-            # 点击获取短信验证码
-            driver.find_element_by_xpath('//*[@id="sendDTPassword"]').click()
-            time.sleep(1)
+                os.remove(picName)
+                time.sleep(1)
+                os.remove(picNameCut)
+                time.sleep(1)
+                i = i+1
+
+                # 点击获取短信验证码
+                driver.find_element_by_xpath('//*[@id="sendDTPassword"]').click()
+                time.sleep(1)
+
+                if not isElementExist('//*[@id="phoneLogin_content"]/div[1]/div[2]', driver):
+                    print('验证码正确')
+                    break
+                if i == 10:
+                    print ('验证码判断超过十次，退出')
+                    driver.quit()
 
             #print('当前尝试次数：'+i)
             #首次打开网页时 元素不存在， 手机号或验证码输错一次就存在了，但是如果输入正确，变成存在不可现
 
-            if not isElementExist('//*[@id="phoneLogin_content"]/div[1]/div[2]',driver) and not isElementExist(
-                    '//*[@id="phoneLogin_content"]/div[2]/text()',driver):
+
+
+
+            if (driver.find_element_by_xpath('//*[@id="sendDTPassword"]').text).__contains__('秒后重新获取'.decode("utf-8")):
                 print('手机号和图片验证码输入正确，点击获取验证码')
                 time.sleep(30)
-                getMessage(token, phone,driver)
+                getMessage(token, phone, driver)
                 time.sleep(3)
                 driver.find_element_by_xpath('//*[@id="sbmit"]').click()
                 time.sleep(3)
-                addCount(phone)
-                time.sleep(2)
+                if not isElementExist('//*[@id="sbmit"]', driver):
 
+                    addCount(phone)
+                    time.sleep(2)
+                    print('手机号' + phone + '注册成功')
+                    #black(token, phone)
+                    #print('已将该号码拉入黑名单')
                 # f = open('gewala_account.txt', 'a')
                 # # f.write('token:'+token)
                 # # f.write('\n')
@@ -288,35 +311,23 @@ def main():
                 # f.write('\n')
                 # f.close()
 
-                time.sleep(2)
-                print('手机号' + phone + '注册成功')
+
+
 
             else:
-                print('输入有误，重新开始')
-                driver.quit()
-        # if ((not isElementExist('//*[@id="phoneLogin_content"]/div[2]/text()')) and (
-        # not driver.find_element_by_xpath(
-        #         '//*[@id="phoneLogin_content"]/div[1]/div[2]').is_displayed())) or ((
-        #                                                                             not driver.find_element_by_xpath(
-        #                                                                                     '//*[@id="phoneLogin_content"]/div[2]/text()').is_displayed()) and (
-        # not isElementExist('//*[@id="phoneLogin_content"]/div[1]/div[2]'))) or ((
-        #                                                                         not driver.find_element_by_xpath(
-        #                                                                                 '//*[@id="phoneLogin_content"]/div[2]/text()').is_displayed()) and (
-        # not driver.find_element_by_xpath(
-        #         '//*[@id="phoneLogin_content"]/div[1]/div[2]').is_displayed())):
-        #     print('手机号和图片验证码输入正确，点击获取验证码')
-        #     break
+                print('该手机号已注册过')
+
 
 
 
         except Exception as e:
             print(e)
-            driver.quit()
+
         finally:
-            black(token, phone)
-            print('已将该号码拉入黑名单')
+
             print('本次注册结束')
             print('---------我是分割线------------')
+            driver.quit()
 
 
 

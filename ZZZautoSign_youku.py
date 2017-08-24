@@ -122,7 +122,7 @@ def getMessage(token,phone,driver):
 
     int = res_data.find('短信验证码是')
     if int == -1:
-        #black(token,phone)
+
         print('接收验证码失败')
     else:
 
@@ -160,7 +160,7 @@ def getMessage(token,phone,driver):
             addCount(phone)
 
             print('手机号' + phone + '注册成功,本次注册结束')
-            black(token,phone)
+            #black(token,phone)
             # print(phone)
             # print('abc'+phone)
             # driver.quit()

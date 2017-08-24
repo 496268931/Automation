@@ -10,12 +10,21 @@ from PIL import Image
 from selenium import webdriver
 
 from com.aliyun.api.gateway.sdk.util import showapi
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
+
 class Param():
     pass
 
+def isElementExist(element, driver):
+    flag = True
+
+    try:
+        driver.find_element_by_xpath(element)
+        return flag
+
+    except:
+        flag = False
+        # driver.execute_script(js)
+        return flag
 
 
 def main(taskUrl, account, password, text):
@@ -45,48 +54,79 @@ def main(taskUrl, account, password, text):
         driver.find_element_by_xpath('//*[@id="dialogLoginCaptchaInput"]').click()
 
         ################验证码
-        picName=os.path.abspath('.')+'\\'+re.sub(r'[^0-9]','',str(datetime.datetime.now()))+'.png'
-        driver.save_screenshot(picName)
-        time.sleep(1)
+        i = 0
+        while i < 5:
+
+            driver.find_element_by_xpath('//*[@id="dialogLoginCaptchaInput"]').clear()
+
+            if i==0:#故意输错误一次，使得验证码输入框和登录按钮索引+1
+                driver.find_element_by_xpath('//*[@id="dialogLoginCaptchaInput"]').send_keys(u'验证码')
+                time.sleep(1)
+                driver.find_element_by_xpath('//*[@id="eventAccount"]/form/div[5]/input').click()
+                time.sleep(2)
 
 
-        #裁切图片
-        img = Image.open(picName)
-        region = (1070, 480, 1150, 515)
-        cropImg = img.crop(region)
-
-        #保存裁切后的图片
-        picNameCut=os.path.abspath('.')+'\\'+re.sub(r'[^0-9]','',str(datetime.datetime.now()))+'.png'
-        cropImg.save(picNameCut)
-        time.sleep(2)
+            picName=os.path.abspath('.')+'\\'+re.sub(r'[^0-9]','',str(datetime.datetime.now()))+'.png'
+            driver.save_screenshot(picName)
+            time.sleep(1)
 
 
-        #进行验证码验证
-        f=open(picNameCut,'rb')
-        b_64=base64.b64encode(f.read())
-        f.close()
-        req=showapi.ShowapiRequest(  "http://ali-checkcode.showapi.com/checkcode","4e5510e696c748ca8d5033dd595bfbbc"   )
-        json_res=req.addTextPara("typeId","3040") \
-            .addTextPara("img_base64",b_64) \
-            .addTextPara("convert_to_jpg","1") \
-            .post()
+            #裁切图片
+            img = Image.open(picName)
+            region = (1070, 480, 1150, 515)
+            cropImg = img.crop(region)
 
-        #print ('1')
-        #print ('json_res data is:', json_res)
-        print (json_res)
-        json_res
+            #保存裁切后的图片
+            picNameCut=os.path.abspath('.')+'\\'+re.sub(r'[^0-9]','',str(datetime.datetime.now()))+'.png'
+            cropImg.save(picNameCut)
+            time.sleep(2)
+
+
+            #进行验证码验证
+            f=open(picNameCut,'rb')
+            b_64=base64.b64encode(f.read())
+            f.close()
+            req=showapi.ShowapiRequest(  "http://ali-checkcode.showapi.com/checkcode","4e5510e696c748ca8d5033dd595bfbbc"   )
+            json_res=req.addTextPara("typeId","3040") \
+                .addTextPara("img_base64",b_64) \
+                .addTextPara("convert_to_jpg","1") \
+                .post()
+
+            #print ('1')
+            #print ('json_res data is:', json_res)
+            print (json_res)
+            json_res
     #str="{\"showapi_res_code\":0,\"showapi_res_error\":\"\",\"showapi_res_body\":{\"Result\":\"28ht\",\"ret_code\":0,\"Id\":\"adb1c363-d566-48a6-820e-55859428599d\"}}"
 
-        int=json_res.find('Result')
-        yanzhengma=json_res[int+11:int+15]
-        print(yanzhengma)
+            int=json_res.find('Result')
+            yanzhengma=json_res[int+11:int+15]
+            print(yanzhengma)
 
-        driver.find_element_by_xpath('//*[@id="dialogLoginCaptchaInput"]').send_keys(yanzhengma)
-        time.sleep(1)
+            driver.find_element_by_xpath('//*[@id="dialogLoginCaptchaInput"]').send_keys(yanzhengma)
+            time.sleep(1)
+            os.remove(picName)
+            time.sleep(1)
+            os.remove(picNameCut)
+            time.sleep(1)
+            i = i+1
+            #点击登录
+            driver.find_element_by_xpath('//*[@id="eventAccount"]/form/div[6]/input').click()
+            time.sleep(5)
+
+
+            #(driver.find_element_by_xpath('//*[@id="eventAccount"]/form/div[
+            # 4]').text).__contains__('验证码错误！'.decode("utf-8"))
+            #因为这个节点在错误时才会出现，且会出现账户不存在和验证码错误等几种情况，不好判断，故根据登录按钮是否可点进行判断
+            if not isElementExist('//*[@id="eventAccount"]/form/div[6]/input', driver):
+                break
+            if i==4:
+                print ('验证码判断超过5次，退出')
+                driver.quit()
+
+
+
         ################验证码
-        #点击登录
-        driver.find_element_by_xpath('//*[@id="eventAccount"]/form/div[5]/input').click()
-        time.sleep(2)
+
 
         target = driver.find_element_by_xpath('//*[@id="s_ui_walaList"]/div/div[1]/img')
         driver.execute_script("arguments[0].scrollIntoView();", target)  # 拖动到可见的元素去

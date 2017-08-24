@@ -314,18 +314,22 @@ def main():
             time.sleep(2)
             driver.find_element_by_xpath('//*[@id="registerForm"]/input').click()
             time.sleep(8)
-            addCount(token, phone)
-            time.sleep(1)
-            print('手机号' + phone + '注册成功')
-            time.sleep(2)
-            black(token, phone)
+            if not isElementExist('//*[@id="registerForm"]/input', driver):
 
+                addCount(token, phone)
+                time.sleep(1)
+                print('手机号' + phone + '注册成功')
+                time.sleep(2)
+                black(token, phone)
+                print('已将该号码拉入黑名单')
+            else:
+                print('注册有误，退出')
         except Exception as e:
             print(e)
 
         finally:
 
-            print('已将该号码拉入黑名单')
+
             print('本次注册结束')
             print('---------我是分割线------------')
             driver.quit()

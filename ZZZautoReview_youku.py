@@ -2,6 +2,7 @@
 import random
 
 import requests
+import urllib2
 from selenium import webdriver
 
 import time
@@ -11,9 +12,60 @@ import time
 
 class Param():
     pass
+def getToken():
+
+    url = "http://api.tianma168.com/tm/Login?uName=tianma8888&pWord=123456789&Code=UTF8"
+    req = urllib2.Request(url)
+    # print req  <urllib2.Request instance at 0x026B05A8>
+    res_data = urllib2.urlopen(req).read()
+    token = res_data[0:res_data.index('&')]
+    return token
+
+def getPhone(token, accountId):
+
+    url = 'http://api.tianma168.com/tm/getPhone?ItemId=759&token=' + token + '&Phone='+accountId+'&Code=UTF8'
+    req = urllib2.Request(url)
+    res_data = urllib2.urlopen(req).read()
+    phone = res_data.decode('utf-8')[0:11]
+    print(phone)
+    return phone
+def releasePhone(token, accountId):
+
+    url = 'http://api.tianma168.com/tm/releasePhone?token='+token+'&phoneList='+accountId+'-759'
+    req = urllib2.Request(url)
+    res_data = urllib2.urlopen(req).read()
+    print('x')
+    print(res_data)
+    print('x')
 
 
 
+def getMessage(token, phone, driver):
+    url = 'http://api.tianma168.com/tm/getMessage?token='+token+'&itemId=759&phone='+phone+'&Code=UTF8'
+
+    req = urllib2.Request(url)
+    res_data = urllib2.urlopen(req).read()
+    print(res_data)
+
+    #data = urllib.request.urlopen(url).read()
+    #z_data = data.decode('UTF-8')
+
+
+    int = res_data.find('短信验证码是')
+    print(int)
+
+    if int == -1:
+
+
+        print('接收验证码失败')
+
+    else:
+        yanzhengma = res_data.decode('UTF-8')[int - 8:int - 2]
+        print(yanzhengma)
+
+
+
+    return yanzhengma
 def main(taskUrl, accountId, password, content):
     try:
         print('开始本次评论任务')
@@ -104,6 +156,23 @@ def main(taskUrl, accountId, password, content):
             driver.find_element_by_id('YT-nloginSubmit').click()
             time.sleep(3)
 
+
+            if isElementExist('//*[@id="YT-rGetMobileCode"]'):
+                driver.find_element_by_xpath('//*[@id="YT-rGetMobileCode"]').click()
+                time.sleep(15)
+                token = getToken()
+                print(token)
+                releasePhone(token, accountId)
+                phone = getPhone(token, accountId)
+                print(1)
+                time.sleep(5)
+                driver.find_element_by_xpath('//*[@id="YT-rGetMobileCode"]').send_keys(getMessage(token, phone,driver))
+                time.sleep(2)
+
+
+
+
+
         # 输入评论
         driver.find_element_by_xpath('//*[@id="commentAction"]/div/div/div[3]/textarea').clear()
         time.sleep(2)
@@ -120,13 +189,13 @@ def main(taskUrl, accountId, password, content):
         print('本次评论任务失败')
         print(e)
     finally:
-        #print(1)
-        driver.quit()
+        print(1)
+        #driver.quit()
 
 
 
 
 if __name__ == '__main__':
     main('http://v.youku.com/v_show/id_XMTU2ODY2NjYyOA==.html?spm=a2h0j.8191423.module_basic_relation.5~5!2~5~5!24~5~5~A'
-         '~5!2~A', '13434843854', 'abc13434843854', u'超级无敌喜欢这部剧')
+         '~5!2~A', '17190833824', 'abc17190833824', u'超级无敌喜欢这部剧')
 

@@ -297,7 +297,7 @@ def main():
             print('手机号' + phone + '注册成功')
             # print(phone)
             # print('abc'+phone)
-            black(token,phone)
+            #black(token,phone)
         except selenium.common.exceptions.TimeoutException as e1:
             print('超时', e1)
 
