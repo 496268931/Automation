@@ -347,20 +347,22 @@ def main():
             driver.find_element_by_xpath('//*[@id="regForm"]/div[6]/div/span/input').click()
             time.sleep(2)
 
-            addCount(phone)
-            time.sleep(2)
-            print('手机号' + phone + '注册成功')
-            time.sleep(2)
-            # print(phone)
-            # print('abc'+phone)
-            # driver.quit()
-            black(token, phone)
-            time.sleep(2)
+            if not isElementExist('//*[@id="regForm"]/div[6]/div/span/input', driver):
+
+                addCount(phone)
+                time.sleep(2)
+                print('手机号' + phone + '注册成功')
+                time.sleep(2)
+
+                black(token, phone)
+                time.sleep(2)
+            else:
+                print('注册有误，退出')
         except Exception as e:
             print (e)
         finally:
             print('---------我是分割线------------')
-            #driver.quit()
+            driver.quit()
 
 if __name__ == '__main__':
     main()

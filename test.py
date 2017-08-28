@@ -8,7 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import ZZZautoReview_163
 import ZZZautoReview_gewala
 import ZZZautoReview_qiy
-import ZZZautoReview_sohu
+import ZZZautoReview_sohuVedio
 import ZZZautoReview_youku
 
 '''

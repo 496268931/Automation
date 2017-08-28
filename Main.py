@@ -2,7 +2,7 @@
 import ZZZautoReview_163
 import ZZZautoReview_gewala
 import ZZZautoReview_qiy
-import ZZZautoReview_sohu
+import ZZZautoReview_sohuVedio
 import ZZZautoReview_youku
 import ZZZautoSign_gewala
 #优酷评论
