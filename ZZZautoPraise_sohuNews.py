@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import base64
+import random
 import time
 
 import os
@@ -7,6 +8,8 @@ import os
 import datetime
 
 import re
+
+import requests
 from PIL import Image
 from selenium import webdriver
 
@@ -37,7 +40,33 @@ def main(taskUrl, data_id, accountId, password, count):
 
         print('开始点赞')
 
-        driver = webdriver.Firefox()
+        iplist = ['123.56.154.24:5818', '59.110.159.237:5818', '47.93.113.175:5818',
+                  '123.56.44.11:5818', '101.200.76.126:5818', '123.56.228.93:5818',
+                  '123.57.48.138:5818', '123.56.72.115:5818', '123.56.77.123:5818',
+                  '123.56.76.207:5818', '47.93.85.217:5818', '59.110.23.162:5818',
+                  '47.92.32.50:5818', '47.91.241.124:5818']
+        #proxy_ip1 = iplist[random.randint(0, len(iplist)-1)]
+        proxy_ip = random.choice(iplist)
+        ip_ip = proxy_ip.split(":")[0]
+        ip_port = int(proxy_ip.split(":")[1])
+
+        num = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+        if num < 15:
+            isDaili = 1  # 1使用代理
+            print(requests.get('http://ip.chinaz.com/getip.aspx',
+                               proxies={"http": 'http://' + proxy_ip}).text)
+        else:
+            isDaili = 0
+            print(requests.get('http://ip.chinaz.com/getip.aspx').text)
+
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('network.proxy.type', isDaili)
+        profile.set_preference('network.proxy.http', ip_ip)
+        profile.set_preference('network.proxy.http_port', ip_port)  # int
+        profile.update_preferences()
+        driver = webdriver.Firefox(firefox_profile=profile)
+
+        #driver = webdriver.Firefox()
         driver.get(taskUrl)
         driver.maximize_window()
         time.sleep(3)

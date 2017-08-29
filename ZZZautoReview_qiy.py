@@ -24,26 +24,27 @@ def main(taskUrl, accountId, password, content):
         # 格式化成2016-03-20 11:45:39形式
         print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
-        iplist = ['47.93.113.175:5818', '59.110.159.237:5818', '123.56.77.123:5818',
-                  '123.56.76.207:5818', '123.56.72.115:5818', '123.56.154.24:5818',
-                  '123.56.44.11:5818', '123.56.228.93:5818', '123.57.48.138:5818',
-                  '101.200.76.126:5818']
+        iplist = ['123.56.154.24:5818', '59.110.159.237:5818', '47.93.113.175:5818',
+                  '123.56.44.11:5818', '101.200.76.126:5818', '123.56.228.93:5818',
+                  '123.57.48.138:5818', '123.56.72.115:5818', '123.56.77.123:5818',
+                  '123.56.76.207:5818', '47.93.85.217:5818', '59.110.23.162:5818',
+                  '47.92.32.50:5818', '47.91.241.124:5818']
         # proxy_ip1 = iplist[random.randint(0, len(iplist)-1)]
         proxy_ip = random.choice(iplist)
         ip_ip = proxy_ip.split(":")[0]
         ip_port = proxy_ip.split(":")[1]
 
-        num = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
-        if num < 11:
-            i = 1  # 1使用代理
+        num = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+        if num < 15:
+            isDaili = 1  # 1使用代理
             print(requests.get('http://ip.chinaz.com/getip.aspx',
                                proxies={"http": 'http://' + proxy_ip}).text)
         else:
-            i = 0
+            isDaili = 0
             print(requests.get('http://ip.chinaz.com/getip.aspx').text)
 
         profile = webdriver.FirefoxProfile()
-        profile.set_preference('network.proxy.type', i)
+        profile.set_preference('network.proxy.type', isDaili)
         profile.set_preference('network.proxy.http', ip_ip)
         profile.set_preference('network.proxy.http_port', ip_port)  # int
         profile.update_preferences()
@@ -134,7 +135,7 @@ def main(taskUrl, accountId, password, content):
                 # 如果点击登陆之后要求扫码登录，选择点击账号密码登录
                 if (driver.find_element_by_xpath(
                         '/html/body/div[2]/div[1]/div/div/div[6]').get_attribute(
-                        'class')) == 'login-frame'.decode("utf-8"):
+                    'class')) == 'login-frame'.decode("utf-8"):
                     driver.find_element_by_xpath(
                         '/html/body/div[2]/div[1]/div/div/div[6]/div[2]/p/span/a[1]').click()
 
@@ -313,7 +314,7 @@ def main(taskUrl, accountId, password, content):
                 # 如果点击登陆之后要求扫码登录，选择点击账号密码登录
                 if (driver.find_element_by_xpath(
                         '/html/body/div[2]/div[1]/div/div/div[6]').get_attribute(
-                        'class')) == 'login-frame'.decode("utf-8"):
+                    'class')) == 'login-frame'.decode("utf-8"):
                     driver.find_element_by_xpath(
                         '/html/body/div[2]/div[1]/div/div/div[6]/div[2]/p/span/a[1]').click()
 
@@ -473,5 +474,4 @@ if __name__ == '__main__':
     # http://www.iqiyi.com/v_19rr769c4s.html#vfrm=3-2-0-0
     main('http://www.iqiyi.com/v_19rrh3jnsj.html#curid=231814007_9191801d47496d7ad349a41fa4f9a4d9',
          '17156648992', 'abc17156648992',
-         u'我也渴望爱情，希望找个爱我的人')
-
+         u'昨天七夕，真是个让人伤心欲断肠的日子')
