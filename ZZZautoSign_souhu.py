@@ -106,7 +106,7 @@ def getMessage(token, phone, driver):
     #print(123)
     if int == -1:
 
-        print('接收验证码失败，该号码已拉入黑名单')
+        print('接收验证码失败')
 
     else:
         yanzhengma = data.decode('UTF-8')[16:22]
