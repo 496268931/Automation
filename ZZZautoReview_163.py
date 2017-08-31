@@ -30,7 +30,33 @@ def main(taskUrl, account, password, text):
         print('开始本次评论任务')
         # 格式化成2016-03-20 11:45:39形式
         print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        '''
+        iplist = ['123.56.154.24:5818', '59.110.159.237:5818', '47.93.113.175:5818',
+                  '123.56.44.11:5818', '101.200.76.126:5818', '123.56.228.93:5818',
+                  '123.57.48.138:5818', '123.56.72.115:5818', '123.56.77.123:5818',
+                  '123.56.76.207:5818', '47.93.85.217:5818', '59.110.23.162:5818',
+                  '47.92.32.50:5818', '47.91.241.124:5818']
+        #proxy_ip1 = iplist[random.randint(0, len(iplist)-1)]
+        proxy_ip = random.choice(iplist)
+        ip_ip = proxy_ip.split(":")[0]
+        ip_port = int(proxy_ip.split(":")[1])
 
+        num = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+        if num < 15:
+            isDaili = 1  # 1使用代理
+            print(requests.get('http://ip.chinaz.com/getip.aspx',
+                               proxies={"http": 'http://' + proxy_ip}).text)
+        else:
+            isDaili = 0
+            print(requests.get('http://ip.chinaz.com/getip.aspx').text)
+
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('network.proxy.type', isDaili)
+        profile.set_preference('network.proxy.http', ip_ip)
+        profile.set_preference('network.proxy.http_port', ip_port)  # int
+        profile.update_preferences()
+        driver = webdriver.Firefox(firefox_profile=profile)
+        '''
         driver = webdriver.Firefox()
         # driver  = webdriver.Chrome()
 
@@ -174,5 +200,7 @@ def main(taskUrl, account, password, text):
 
 
 if __name__ == '__main__':
-    main('http://comment.news.163.com/news2_bbs/CPMT4G4F0001899N.html', 'i493735',
-         'aaafff', u'游客飘过~~~~')
+    #main('http://comment.news.163.com/news2_bbs/CPMT4G4F0001899N.html', 'i493735', 'aaafff',
+    # u'游客飘过~~~~')
+    main('http://comment.media.163.com/media_bbs/CR0J7JM100763NKJ.html', 'i493735', 'aaafff',
+         u'冯绍峰好帅啊~~~~')

@@ -70,7 +70,7 @@ def main(taskUrl, data_id, accountId, password, count):
             driver = webdriver.Firefox()
             driver.get(taskUrl)
             driver.maximize_window()
-            #time.sleep(1)
+            time.sleep(2)
 
             # m = driver.find_element_by_xpath("//*[contains(@class,'c-comment-more')]").text
             # n = m.find(u'人参与')
