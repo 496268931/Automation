@@ -21,7 +21,7 @@ def isElementExist(element, driver):
 
 def main(taskUrl, created_time, count):
     for num in range(1, int(count) + 1):
-       # try:
+        try:
             print(num)
             # 格式化成2016-03-20 11:45:39形式
             print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
@@ -67,14 +67,17 @@ def main(taskUrl, created_time, count):
             pageNums = len(pageList)
             #print(pageNums)
 
-            pageNum = driver.find_element_by_xpath('//*[@id="mainReplies"]/ul/li['+str(
-                pageNums-1)+']/a').text
+            pageNum = driver.find_element_by_xpath('//*[@id="mainReplies"]/ul/li['+str(pageNums-1)+']').text
             #print(pageNum)
             print(u'评论共 '+pageNum+u' 页')
 
             currentPage = 1
             while currentPage <= pageNum:
                 print('--------------')
+                currentpageList = driver.find_elements_by_xpath('//*[@id="mainReplies"]/ul/li')
+                currentpageNums = len(currentpageList)
+                print(currentpageNums)
+
                 print('当前是第 %d 页'%currentPage)
                 a = driver.find_elements_by_xpath("//*[contains(@id,'tie-data')]")
                 #print(a)
@@ -87,7 +90,7 @@ def main(taskUrl, created_time, count):
                         driver.find_element_by_xpath('//*[@id="'+c+'"]/div/ul/li[1]/a').click()
                         print('找到指定评论,点赞成功')
                         time.sleep(10)
-                        return
+                        driver.quit()
 
 
                 #print(driver.find_element_by_xpath("//*[contains(@class,'postTime')]")).text
@@ -96,7 +99,7 @@ def main(taskUrl, created_time, count):
                 driver.execute_script("arguments[0].scrollIntoView();", target)  # 拖动到可见的元素去
                 time.sleep(2)
 
-                driver.find_element_by_xpath('//*[@id="mainReplies"]/ul/li['+str(pageNums)+']/a').click()
+                driver.find_element_by_xpath('//*[@id="mainReplies"]/ul/li['+str(currentpageNums)+']/a').click()
                 time.sleep(2)
 
 
@@ -105,13 +108,13 @@ def main(taskUrl, created_time, count):
 
 
 
-'''
+
         except Exception as e:
             print (e)
         finally:
             print('---------我是分割线------------')
             driver.quit()
-'''
+
 
 if __name__ == '__main__':
     #main('http://comment.news.163.com/news_shehui7_bbs/CT1GHQBT0001875P.html', u'2017-08-31 09:39:26','1')
