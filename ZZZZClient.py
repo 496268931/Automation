@@ -7,7 +7,9 @@ from selenium import webdriver
 import sys
 
 #import ZZZautoReview_gewala
+import ZZZautoReview_163
 import ZZZautoReview_qiy
+import ZZZautoReview_sohuVedio
 import ZZZautoReview_youku
 
 reload(sys)
@@ -28,7 +30,7 @@ class ClientParam():
     apiURL = 'http://114.215.170.176:4000'
     sleep = 1
     #taskTypes = '111,911,112'
-    taskTypes = '512,412'
+    taskTypes = '212,612,512,412'
     # taskTypes = '911'
 
     routeCheckTask = '/check-task'
@@ -211,17 +213,32 @@ def runTask1(task):
 def autoReview(task):
     try:
         if(task['type'] == 412):
-            ZZZautoReview_youku.main(task['taskUrl'],task['account']['accountId'], task['account']['password'],task['content'])
+            ZZZautoReview_youku.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], task['content'])
 
             return {
                 'status': 1
             }
         elif(task['type'] == 512):
-            ZZZautoReview_qiy.main(task['taskUrl'],task['account']['accountId'], task['account']['password'],task['content'])
+            ZZZautoReview_qiy.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], task['content'])
 
             return {
                 'status': 1
             }
+        elif(task['type'] == 612):
+            ZZZautoReview_sohuVedio.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], task['content'])
+
+            return {
+                'status': 1
+            }
+        elif(task['type'] == 212):
+            ZZZautoReview_163.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], task['content'])
+
+            return {
+                'status': 1
+            }
+
+
+
 
 
         else:
