@@ -1,139 +1,69 @@
-# -*- coding: utf-8 -*-
-import base64
-import time
+from bs4 import BeautifulSoup
 
-import os
+html = """
+<html><head><title>The Dormouse's story</title></head>
+<body>
+<p class="title" name="dromouse"><b>The Dormouse's story</b></p>
+<p class="story">Once upon a time there were three little sisters; and their names were
+<a href="http://example.com/elsie" class="sister" id="link1"><!-- Elsie --></a>,
+<a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
+<a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
+and they lived at the bottom of a well.</p>
+<p class="story">...</p>
+"""
 
-import datetime
+soup = BeautifulSoup(html, "html.parser" )
 
-import re
-from PIL import Image
-from selenium import webdriver
+soup = BeautifulSoup(open('index.html'), "html.parser" )
 
-#   该方法用来确认元素是否存在，如果存在返回flag=true，否则返回false
-from com.aliyun.api.gateway.sdk.util import showapi
-
-
-def isElementExist(element,driver):
-    flag = True
-
-    try:
-        driver.find_element_by_xpath(element)
-        return flag
-
-    except:
-        flag = False
-        # driver.execute_script(js)
-        return flag
-
-def main(taskUrl, data_id, accountId, password, count):
-    for num in range(1, int(count)+1):
-        print(num)
-        # 格式化成2016-03-20 11:45:39形式
-        print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-
-        js="var q=document.documentElement.scrollTop=-50"
+#print soup.prettify()
+#Tag
+print soup.title
+#<title>The Dormouse's story</title>
 
 
-        print('开始点赞')
+print soup.head
+#<head><title>The Dormouse's story</title></head>
+print soup.a
+#<a class="sister" href="http://example.com/elsie" id="link1"><!-- Elsie --></a>
+print soup.p
+#<p class="title" name="dromouse"><b>The Dormouse's story</b></p>
+print type(soup.a)
+#<class 'bs4.element.Tag'>
 
-        driver = webdriver.Firefox()
-        driver.get(taskUrl)
-        driver.maximize_window()
-        time.sleep(3)
+print
 
-        #m = driver.find_element_by_xpath("//*[contains(@class,'c-comment-more')]").text
-        #n = m.find(u'人参与')
-        #i = m[2:n]
+print soup.name
+print soup.head.name
+#[document]
+#head
+print soup.p.attrs
+#{'class': ['title'], 'name': 'dromouse'}
+print soup.p['class']
+#['title']
+print soup.p.get('class')
+#['title']
+soup.p['class']="newClass"
+print soup.p
+#<p class="newClass" name="dromouse"><b>The Dormouse's story</b></p>
 
+print
 
-        while isElementExist("//*[contains(@class,'c-comment-more')]", driver):
-            print('点击更多')
-            target = driver.find_element_by_xpath("//*[contains(@class,'c-comment-more')]")
-            driver.execute_script("arguments[0].scrollIntoView();", target)  # 拖动到可见的元素去
+#NavigableString
+print soup.p.string
+#The Dormouse's story
+print type(soup.p.string)
+#<class 'bs4.element.NavigableString'>
 
-            time.sleep(3)
-            if driver.find_element_by_xpath("//*[contains(@class,'close-sohu')]").is_displayed():
-                print(0)
-                driver.find_element_by_xpath("//*[contains(@class,'close-sohu')]").click()
-            time.sleep(2)
+print
 
-            driver.execute_script(js)
-            time.sleep(2)
-            driver.find_element_by_xpath("//*[contains(@class,'c-comment-more')]").click()
-            time.sleep(2)
+#BeautifulSoup
+print type(soup.name)
+#<type 'unicode'>
+print soup.name
+# [document]
+print soup.attrs
+#{} 空字典
 
-        driver.find_element_by_xpath("//*[contains(@data-id,"+data_id+")]/div[2]/div[2]/div[2]/a[3]/i").click()
-        time.sleep(2)
+print
 
-        driver.find_element_by_xpath('/html/body/div[4]/div[3]/ul/li[1]/input').send_keys(accountId)
-        time.sleep(2)
-        driver.find_element_by_xpath('/html/body/div[4]/div[3]/ul/li[2]/input').send_keys(password)
-        time.sleep(2)
-        driver.find_element_by_xpath('/html/body/div[4]/div[3]/div[2]/input').click()
-        time.sleep(2)
-        while driver.find_element_by_xpath('/html/body/div[4]/div[3]/ul/li[3]/img').is_displayed():
-            print('有验证码')
-            driver.find_element_by_xpath('/html/body/div[4]/div[3]/ul/li[3]/img').click()
-            time.sleep(2)
-
-            picName = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '', str(
-                datetime.datetime.now())) + '.png'
-            driver.save_screenshot(picName)
-            time.sleep(1)
-
-            # 裁切图片
-            img = Image.open(picName)
-
-            region = (955, 520, 1058, 556)
-            cropImg = img.crop(region)
-
-            # 保存裁切后的图片
-            picNameCut = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '', str(
-                datetime.datetime.now())) + '.png'
-            cropImg.save(picNameCut)
-            time.sleep(2)
-
-            # 进行验证码验证
-            f = open(picNameCut, 'rb')
-            b_64 = base64.b64encode(f.read())
-            f.close()
-            req = showapi.ShowapiRequest("http://ali-checkcode.showapi.com/checkcode",
-                                         "4e5510e696c748ca8d5033dd595bfbbc")
-            json_res = req.addTextPara("typeId", "3040") \
-                .addTextPara("img_base64", b_64) \
-                .addTextPara("convert_to_jpg", "1") \
-                .post()
-
-            # print ('1')
-            # print ('json_res data is:', json_res)
-            print (json_res)
-            json_res
-            # str="{\"showapi_res_code\":0,\"showapi_res_error\":\"\",\"showapi_res_body\":{\"Result\":\"28ht\",\"ret_code\":0,\"Id\":\"adb1c363-d566-48a6-820e-55859428599d\"}}"
-
-            f = json_res.find('Result')
-            yanzhengma = json_res[f + 11:f + 15]
-            print(yanzhengma)
-
-            time.sleep(3)
-            driver.find_element_by_xpath('/html/body/div[4]/div[3]/ul/li[3]/input').click()
-            time.sleep(3)
-            driver.find_element_by_xpath('/html/body/div[4]/div[3]/ul/li[3]/input').clear()
-            time.sleep(3)
-            driver.find_element_by_xpath('/html/body/div[4]/div[3]/ul/li[3]/input').send_keys(yanzhengma)
-            time.sleep(3)
-
-
-            driver.find_element_by_xpath(
-                '/html/body/div[4]/div[3]/div[2]/input').click()
-            time.sleep(8)
-            os.remove(picName)
-            time.sleep(2)
-            os.remove(picNameCut)
-            time.sleep(2)
-        driver.find_element_by_xpath("//*[contains(@data-id,"+data_id+")]/div[2]/div[2]/div[2]/a[3]/i").click()
-        time.sleep(2)
-
-
-if __name__ == '__main__':
-    main('http://www.sohu.com/a/167750199_585752', '813024476', '13533234158', 'abc13533234158', '1')
