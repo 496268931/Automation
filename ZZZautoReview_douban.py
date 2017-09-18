@@ -45,13 +45,14 @@ def isElementExist(element, driver):
         # driver.execute_script(js)
         return flag
 
-def main(account, password, text, keyword = 2017, pageNum = 1):
-    #while True:
-        time.sleep(2)
+
+def main(account, password, text=u'推荐大家看看', keyword = 2017, pageNum = 1):
+    for xyz in range(1, 401):
+
         try:
             # 格式化成2016-03-20 11:45:39形式
-            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-
+            print('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+            print xyz
             '''
             iplist = ['123.56.154.24:5818', '59.110.159.237:5818', '47.93.113.175:5818',
                   '123.56.44.11:5818', '101.200.76.126:5818', '123.56.228.93:5818',
@@ -86,6 +87,11 @@ def main(account, password, text, keyword = 2017, pageNum = 1):
             driver.maximize_window()
             time.sleep(2)
 
+
+
+
+
+
             pageMax=int(driver.find_element_by_xpath("//div[contains(@class, 'paginator')]/a[last()-1]").text)
             print str(keyword)+' 为关键词的搜索结果最大页数为 %d' %pageMax
             time.sleep(2)
@@ -96,14 +102,17 @@ def main(account, password, text, keyword = 2017, pageNum = 1):
                 randompage = str(15*(int(x)-1))
                 driver.get('https://movie.douban.com/subject_search?search_text='+str(keyword)+'&cat=1002&start='+randompage)
                 time.sleep(2)
+                print 'https://movie.douban.com/subject_search?search_text='+str(keyword)+'&cat=1002&start='+randompage
+                time.sleep(2)
             elif int(pageNum) != int(1) and int(pageNum) <= pageMax:
                 print '进入指定的第 %d 页'%pageNum
                 pageNum = str(15*(int(pageNum)-1))
                 driver.get('https://movie.douban.com/subject_search?search_text='+str(keyword)+'&cat=1002&start='+pageNum)
                 time.sleep(2)
+                print 'https://movie.douban.com/subject_search?search_text='+str(keyword)+'&cat=1002&start='+pageNum
+                time.sleep(2)
             else:
                 print '输入页码有误，退出'
-
 
 
 
@@ -122,14 +131,14 @@ def main(account, password, text, keyword = 2017, pageNum = 1):
             time.sleep(1)
             driver.find_element_by_xpath('//*[@id="password"]').send_keys(password)
             time.sleep(2)
-
+            
             if isElementExist('//*[contains(@class, "captcha_image")]', driver):
 
                 # 如果存在验证码图片
                 print('有验证码')
 
                 picName = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '', str(
-                datetime.datetime.now())) + '.png'
+                    datetime.datetime.now())) + '.png'
                 driver.save_screenshot(picName)
                 time.sleep(1)
 
@@ -141,7 +150,7 @@ def main(account, password, text, keyword = 2017, pageNum = 1):
 
                 # 保存裁切后的图片
                 picNameCut = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '', str(
-                datetime.datetime.now())) + '.png'
+                    datetime.datetime.now())) + '.png'
                 cropImg.save(picNameCut)
                 time.sleep(2)
 
@@ -150,7 +159,7 @@ def main(account, password, text, keyword = 2017, pageNum = 1):
                 b_64 = base64.b64encode(f.read())
                 f.close()
                 req = showapi.ShowapiRequest("http://ali-checkcode.showapi.com/checkcode",
-                                     "4e5510e696c748ca8d5033dd595bfbbc")
+                                             "4e5510e696c748ca8d5033dd595bfbbc")
                 json_res = req.addTextPara("typeId", "20") \
                     .addTextPara("img_base64", b_64) \
                     .addTextPara("convert_to_jpg", "1") \
@@ -185,21 +194,20 @@ def main(account, password, text, keyword = 2017, pageNum = 1):
                 driver.find_element_by_xpath('//*[@id="captcha_field"]').send_keys(yanzhengma)
                 time.sleep(2)
 
-
-
-                driver.find_element_by_xpath('//*[@id="lzform"]/div[7]/input').click()
-
-                time.sleep(8)
                 os.remove(picName)
                 time.sleep(2)
                 os.remove(picNameCut)
                 time.sleep(2)
 
+                driver.find_element_by_xpath('//*[@id="lzform"]/div[7]/input').click()
+                time.sleep(10)
+
+
             else:
-            #if isElementExist("//*[contains(@id, 'lzform')]", driver):
+                #if isElementExist("//*[contains(@id, 'lzform')]", driver):
                 print('无验证码')
                 driver.find_element_by_xpath('//*[@id="lzform"]/div[6]/input').click()
-                time.sleep(2)
+                time.sleep(10)
 
 
 
@@ -208,17 +216,11 @@ def main(account, password, text, keyword = 2017, pageNum = 1):
 
 
 
-
-
-
-
-
-
-
-
+            currentClassName = driver.find_element_by_xpath('//*[@id="root"]/div/div[2]/div[1]/div[1]/div[1]').get_attribute('class')
+            print currentClassName
 
             #每个页面内链接个数
-            linknum=len(driver.find_elements_by_xpath("//div[contains(@class, 'sc-ifAKCX ')]"))
+            linknum=len(driver.find_elements_by_xpath("//div[contains(@class, '"+ currentClassName+"')]"))
             print '当前页面链接数为 %d'%linknum
             num = random.choice(range(1, linknum+1))
             print '随机选择第 %d 个'%num
@@ -236,35 +238,62 @@ def main(account, password, text, keyword = 2017, pageNum = 1):
                     'cinema') == -1 and link.is_displayed():
 
 
-                        j = j + 1
+                    j = j + 1
 
-                        #同一个页面内链接是重复的，且两个重复的链接第一个无法点击，故选择第二个进行点击
-                        if j%2 == 1:
-                            i = (j+1)/2
+                    #同一个页面内链接是重复的，且两个重复的链接第一个无法点击，故选择第二个进行点击
+                    if j%2 == 1:
+                        i = (j+1)/2
 
-                        else:
+                    else:
 
-                            i = j/2
+                        i = j/2
 
-                            if num == i:
+                        if num == i:
 
-                                print(link.get_attribute("href"))
-                                print('点击当前链接')
-                                time.sleep(2)
-                                link.click()
-                                time.sleep(3)
 
-                                break
+                            print(u'点击当前链接: '+ link.get_attribute("href"))
+                            time.sleep(2)
+                            link.click()
+                            time.sleep(3)
+
+                            break
 
 
             target = driver.find_element_by_xpath('//*[@id="comments-section"]/div[1]/a/span')
             driver.execute_script("arguments[0].scrollIntoView();", target)  # 拖动到可见的元素去
             time.sleep(2)
+
+
+
+
+            #当前页面电影评论数
+            commentNum=len(driver.find_elements_by_xpath("//div[contains(@class, 'comment-item')]"))
+            if isElementExist('//*[@id="following-comments"]', driver):
+                commentNum = commentNum - 1
+
+            if commentNum > 0:
+
+                random_comment = random.choice(range(1, commentNum+1))
+
+                print '当前页面短评数为 %d 随机选择第 %d 个'%(commentNum, random_comment)
+                copytext = driver.find_element_by_xpath('//*[@id="hot-comments"]/div['+str(random_comment)+']/div/p').text
+
+                text = copytext
+                time.sleep(2)
+
+                print text
+                time.sleep(2)
+            else:
+                print '当前页面没有评论，采用默认评论：'+text
+
+
+
             driver.find_element_by_xpath('//*[@id="comments-section"]/div[1]/a/span').click()
             time.sleep(2)
 
             driver.find_element_by_xpath('//*[@id="star5"]').click()
             time.sleep(2)
+
 
             driver.find_element_by_xpath('//*[@id="comment"]').click()
             time.sleep(2)
@@ -274,18 +303,35 @@ def main(account, password, text, keyword = 2017, pageNum = 1):
             time.sleep(2)
 
             driver.find_element_by_xpath('//*[@id="submits"]/span/input').click()
-            time.sleep(2)
+            time.sleep(10)
 
-            print '本次自动评论成功'
+
+
+
+
+
+            intervalTIME = random.choice(range(1, 2))
+            time.sleep(1)
+
+            driver.quit()
+            time.sleep(2)
+            print '技能CD： '+ str(intervalTIME) + '小时'
+
+
+
+
+            time.sleep(intervalTIME*1200)
+            print('本次评论成功，结束时间为： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             time.sleep(2)
 
 
         except Exception as e:
-            print '操作有误'+ e
+            print e
+            driver.quit()
 
         finally:
             print('---------我是分割线------------')
-            #driver.quit()
+
 
 
 if __name__ == '__main__':
