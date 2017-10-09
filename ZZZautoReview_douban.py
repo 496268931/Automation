@@ -141,6 +141,8 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
             print taskId
             content = None
             print content
+            timeInterval = None
+            print timeInterval
 
             if checkTask['data'] is None:
                 taskurl = None
@@ -497,30 +499,31 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
 
             if None != taskId:
-                print '上报任务结果:'
+                print '上报任务成功结果:'
                 report_task(clientId, taskId, '1')
                 time.sleep(2)
 
             print('本次评论成功，结束时间为： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-
-
-            intervalTIME = random.choice(range(1, 2))
-            time.sleep(1)
-
             driver.quit()
-            time.sleep(2)
-            print '技能CD： '+ str(intervalTIME) + '小时'
 
-            time.sleep(intervalTIME*1200)
+
+            if None == timeInterval:
+                timeInterval = random.choice(range(1, 2))
+                print '技能CD： '+ str(timeInterval) + '小时'
+                time.sleep(timeInterval*1200)
+            else:
+                print '技能CD： '+ str(timeInterval) + '秒'
+                time.sleep(int(timeInterval))
 
 
 
         except Exception as e:
             print e
-            if None != taskId:
-                print '上报任务结果:'
-                report_task(clientId, taskId, '0')
             driver.quit()
+            if None != taskId:
+                print '上报任务失败结果:'
+                report_task(clientId, taskId, '0')
+
 
         finally:
             print('---------我是分割线------------')
