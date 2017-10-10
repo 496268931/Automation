@@ -233,7 +233,7 @@ def add_account(username, password, APP_KEY, APP_SECRET, CALLBACK_URL, platform,
     #     print(requests.get('http://ip.chinaz.com/getip.aspx').text)
 
     profile = webdriver.FirefoxProfile()
-    profile.set_preference('network.proxy.type', 1)
+    profile.set_preference('network.proxy.type', 0)
     profile.set_preference('network.proxy.http', ip_ip)
     profile.set_preference('network.proxy.http_port', ip_port)  # int
     profile.update_preferences()
@@ -274,27 +274,31 @@ def update_cookies(username, password, response_dirctory):
         '微博', 'data': json.JSONEncoder().encode(response_dirctory)})
     print req.text
 
+
+
 def getWeiboContent(client, uid, i=0):
 
     s = client.statuses.user_timeline.get(uid = uid)
     weibocontent = s['statuses'][i]['text']
     return weibocontent
 
+
 def sendWeibo(client, content, safeUrl):
     s = client.statuses.share.post(status=content + ' ' +safeUrl)
     return s
 
-def commentWeibo(client, content, weiboId):
-    s = client.comments.create.post(comment=content, id=weiboId)
+def commentWeibo(client, content, mid):
+    s = client.comments.create.post(comment=content, id=mid)
+    #print type(s)   #<class 'weibo.JsonDict'>
     return s
 
-def main(APP_KEY, APP_SECRET, CALLBACK_URL):
+def main(APP_KEY, APP_SECRET, CALLBACK_URL, text, mid):
 
     # add_account('18354254831', 'pp9999', APP_KEY, APP_SECRET, CALLBACK_URL, '微博')
     # time.sleep(100)
 
 
-    account_info = get_account('微博2')
+    account_info = get_account('微博3')
     print account_info  #<type 'dict'>
 
 
@@ -354,15 +358,20 @@ def main(APP_KEY, APP_SECRET, CALLBACK_URL):
     #http://open.weibo.com/wiki/2/comments/create
     #对一条微博进行评论
 
-    commentweibo = commentWeibo(client, '真逗啊，一个二哈等于两个金毛', 4156918496378219)
-    print(commentweibo)
+    commentweibo = commentWeibo(client, text, mid)
+    print commentweibo
 
     print('-----------')
     #http://open.weibo.com/wiki/2/statuses/user_timeline
-    ## 获取某个用户最新发表的微博列表
+    # # 获取某个用户最新发表的微博列表
     # getweibocontent = getWeiboContent(client, 5770961845)
     # print getweibocontent
 
+    print('-----------')
+    #http://open.weibo.com/wiki/2/users/show
+    #获取用户信息
+    #userInfo = getuserInfo(client)
+    #print userInfo
 
 
 
@@ -373,6 +382,7 @@ def main(APP_KEY, APP_SECRET, CALLBACK_URL):
 
 
 if __name__ == '__main__':
+    print('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     app_key = '2260324575' ## 填写应用程序的信息
     app_secret = 'fb8ec84988227c4cb6fd6b4f5091b7a1'
     callback_url = 'http://vpiao.wiseweb.com.cn/authformweibo'
@@ -395,17 +405,81 @@ if __name__ == '__main__':
     # # for line in lines:
     # #     print line
     # f.close()
-    #
-    # for num in range(6, 15):
+
+    # for num in range(1, 6):
     #     # try:
     #         print num
-    #         print lines[num-1][0:11]
-    #         add_account(lines[num-1][0:11], lines[num-1].split('----')[1], app_key, app_secret,
-    #                     callback_url, '微博2', num)
+    #         print lines[num-1].split('----')[0]
+    #         add_account(lines[num-1].split('----')[0], lines[num-1].split('----')[1], app_key,
+    #                     app_secret,
+    #                     callback_url, '微博3', num)
     #         print '--------分割线--------'
-    #         time.sleep(10)
+    #         time.sleep(600)
     #     # except Exception as e:
     #     #     print e
 
-    main(app_key, app_secret, callback_url)
 
+
+    #接口调用频率
+    # r = requests.get('https://api.weibo.com/2/account/rate_limit_status.json', params={
+    #     'access_token': '2.00vpMElGzfFy9C90c1fef3c9Zvk3KB'})
+    # print r.text
+
+
+
+
+    # x = requests.get('https://api.weibo.com/2/users/show.json', params={'access_token':
+    #                                                                         '2.00KtMXXGzfFy9C477e3f8f4eYjf1aC', 'screen_name': '阚掘聪烧八将'}).text
+    #
+    # xx = json.loads(x)
+    # print xx
+    # print xx['status']
+    # print xx['status']['text']
+    #
+    #
+    # print '----------------------'
+    y = requests.get('https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text
+    yy = json.loads(y)
+
+
+    # print yy
+    # print len(yy['statuses'])
+    # for i in yy['statuses']:
+    #     #print i
+    #     print i['text']
+    #     print i['user']['screen_name']
+
+    content = yy['statuses'][0]['text']
+    mid = yy['statuses'][0]['mid']
+    print content
+    print mid
+    print '======================首次检测==========================='
+    # print yy['statuses'][0]['user']
+    # print yy['statuses'][0]['user']['screen_name']
+    # print yy['statuses'][0]['user']['followers_count']
+
+
+    text = '全是鹿晗体'
+
+    while True:
+        if content == json.loads(requests.get(
+                'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['text']:
+            print '没有最新微博'
+
+        else:
+
+            print '有最新微博'
+            content = json.loads(requests.get(
+                'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['text']
+            mid = json.loads(requests.get(
+                'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['mid']
+
+            main(app_key, app_secret, callback_url, text, mid)
+
+
+
+
+        print content
+        print mid
+        print '----分割线----'
+        time.sleep(30)
