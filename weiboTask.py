@@ -287,18 +287,18 @@ def sendWeibo(client, content, safeUrl):
     s = client.statuses.share.post(status=content + ' ' +safeUrl)
     return s
 
-def commentWeibo(client, content, mid):
-    s = client.comments.create.post(comment=content, id=mid)
+def commentWeibo(client, comment, rid):
+    s = client.comments.create.post(comment=comment, id=rid)
     #print type(s)   #<class 'weibo.JsonDict'>
     return s
 
-def main(APP_KEY, APP_SECRET, CALLBACK_URL, text, mid):
+def main(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid):
 
     # add_account('18354254831', 'pp9999', APP_KEY, APP_SECRET, CALLBACK_URL, '微博')
     # time.sleep(100)
 
 
-    account_info = get_account('微博3')
+    account_info = get_account('斌哥小号')
     print account_info  #<type 'dict'>
 
 
@@ -358,7 +358,7 @@ def main(APP_KEY, APP_SECRET, CALLBACK_URL, text, mid):
     #http://open.weibo.com/wiki/2/comments/create
     #对一条微博进行评论
 
-    commentweibo = commentWeibo(client, text, mid)
+    commentweibo = commentWeibo(client, comment, rid)
     print commentweibo
 
     print('-----------')
@@ -405,14 +405,14 @@ if __name__ == '__main__':
     # # for line in lines:
     # #     print line
     # f.close()
-
+    #
     # for num in range(1, 6):
     #     # try:
     #         print num
     #         print lines[num-1].split('----')[0]
     #         add_account(lines[num-1].split('----')[0], lines[num-1].split('----')[1], app_key,
     #                     app_secret,
-    #                     callback_url, '微博3', num)
+    #                     callback_url, '斌哥小号', num)
     #         print '--------分割线--------'
     #         time.sleep(600)
     #     # except Exception as e:
@@ -451,6 +451,8 @@ if __name__ == '__main__':
 
     content = yy['statuses'][0]['text']
     mid = yy['statuses'][0]['mid']
+
+    content = u'微博博'
     print content
     print mid
     print '======================首次检测==========================='
@@ -459,27 +461,37 @@ if __name__ == '__main__':
     # print yy['statuses'][0]['user']['followers_count']
 
 
-    text = '全是鹿晗体'
+    #text = '我评论某条评论的评论- - '
+    #main(app_key, app_secret, callback_url, text, 4161078537640995)
 
-    while True:
-        if content == json.loads(requests.get(
+    #while True:
+    text = ['持续关注这个话题！','这个微博的内容我都好喜欢啊','不错','每天一顶','我现在只关心鹿关啥时候分','非常好','哇塞，还有这么厉害的电影攻略微博']
+    for i in range(1, 10000000):
+        try:
+            if content == json.loads(requests.get(
                 'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['text']:
-            print '没有最新微博'
+                print '没有最新微博'
 
-        else:
+            else:
 
-            print '有最新微博'
-            content = json.loads(requests.get(
+                print '有最新微博'
+                content = json.loads(requests.get(
                 'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['text']
-            mid = json.loads(requests.get(
+                mid = json.loads(requests.get(
                 'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['mid']
 
-            main(app_key, app_secret, callback_url, text, mid)
+                current_text = text[random.choice([0, len(text)-1])]
+                print current_text
+                main(app_key, app_secret, callback_url, current_text, mid)
 
+            print content
+            print mid
 
+            time.sleep(3600)
 
+        except Exception as e:
+            print e
 
-        print content
-        print mid
-        print '----分割线----'
-        time.sleep(30)
+        finally:
+            print('---------我是分割线------------')
+

@@ -508,9 +508,9 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
 
             if None == timeInterval:
-                timeInterval = random.choice(range(1, 2))
+                timeInterval = random.choice(range(21600, 21700))
                 print '技能CD： '+ str(timeInterval) + '小时'
-                time.sleep(timeInterval*1200)
+                time.sleep(timeInterval)
             else:
                 print '技能CD： '+ str(timeInterval) + '秒'
                 time.sleep(int(timeInterval))
