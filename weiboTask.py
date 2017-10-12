@@ -292,13 +292,13 @@ def commentWeibo(client, comment, rid):
     #print type(s)   #<class 'weibo.JsonDict'>
     return s
 
-def main(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid):
+def review(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid):
 
     # add_account('18354254831', 'pp9999', APP_KEY, APP_SECRET, CALLBACK_URL, '微博')
     # time.sleep(100)
 
 
-    account_info = get_account('斌哥小号')
+    account_info = get_account('评论微博')
     print account_info  #<type 'dict'>
 
 
@@ -327,13 +327,14 @@ def main(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid):
     current_expire_in = json.loads(r.text)['expire_in']
     print '剩余时间为: %d'%current_expire_in
 
+
     if current_expire_in < 5:#如果有效期小于五秒钟，更新token
         driver = webdriver.Firefox()
 
         code = getCode(driver, APP_KEY, CALLBACK_URL, username, password)
         print code
 
-        response_dirctory = getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL )
+        response_dirctory = getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL)
         print response_dirctory
         #print type(response_dirctory)   #<type 'dict'>
 
@@ -380,7 +381,63 @@ def main(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid):
     #print client.statuses.update.post(status=u'通过Python SDK发微博')
     #print client.friendships.friends.bilateral.ids.get(uid = 5606463752)
 
+def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL):
+    y = requests.get('https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text
+    yy = json.loads(y)
 
+    # print yy
+    # print len(yy['statuses'])
+    # for i in yy['statuses']:
+    #     #print i
+    #     print i['text']
+    #     print i['user']['screen_name']
+
+    content = yy['statuses'][0]['text']
+    mid = yy['statuses'][0]['mid']
+
+    content = u'微博博'
+    print content
+    print mid
+    print '======================首次检测==========================='
+    # print yy['statuses'][0]['user']
+    # print yy['statuses'][0]['user']['screen_name']
+    # print yy['statuses'][0]['user']['followers_count']
+
+
+    #text = '我评论某条评论的评论- - '
+    #comment(app_key, app_secret, callback_url, text, 4161078537640995)
+
+    #while True:
+    text = ['持续关注这个话题！','这个微博的内容我都好喜欢啊','不错','每天一顶','我现在只关心鹿关啥时候分','非常好','哇塞，还有这么厉害的电影攻略微博']
+    for i in range(1, 10000000):
+        print('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        try:
+            if content == json.loads(requests.get(
+                    'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['text']:
+                print '没有最新微博'
+
+            else:
+
+                print '有最新微博'
+                content = json.loads(requests.get(
+                    'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['text']
+                mid = json.loads(requests.get(
+                    'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['mid']
+
+                current_text = text[random.choice([0, len(text)-1])]
+                print current_text
+                review(APP_KEY, APP_SECRET, CALLBACK_URL, current_text, mid)
+
+            print content
+            print mid
+
+            time.sleep(900)
+
+        except Exception as e:
+            print e
+
+        finally:
+            print('---------我是分割线------------')
 if __name__ == '__main__':
     print('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     app_key = '2260324575' ## 填写应用程序的信息
@@ -438,60 +495,7 @@ if __name__ == '__main__':
     #
     #
     # print '----------------------'
-    y = requests.get('https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text
-    yy = json.loads(y)
 
+    monitorandcomment(app_key, app_secret, callback_url)
 
-    # print yy
-    # print len(yy['statuses'])
-    # for i in yy['statuses']:
-    #     #print i
-    #     print i['text']
-    #     print i['user']['screen_name']
-
-    content = yy['statuses'][0]['text']
-    mid = yy['statuses'][0]['mid']
-
-    content = u'微博博'
-    print content
-    print mid
-    print '======================首次检测==========================='
-    # print yy['statuses'][0]['user']
-    # print yy['statuses'][0]['user']['screen_name']
-    # print yy['statuses'][0]['user']['followers_count']
-
-
-    #text = '我评论某条评论的评论- - '
-    #main(app_key, app_secret, callback_url, text, 4161078537640995)
-
-    #while True:
-    text = ['持续关注这个话题！','这个微博的内容我都好喜欢啊','不错','每天一顶','我现在只关心鹿关啥时候分','非常好','哇塞，还有这么厉害的电影攻略微博']
-    for i in range(1, 10000000):
-        try:
-            if content == json.loads(requests.get(
-                'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['text']:
-                print '没有最新微博'
-
-            else:
-
-                print '有最新微博'
-                content = json.loads(requests.get(
-                'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['text']
-                mid = json.loads(requests.get(
-                'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['mid']
-
-                current_text = text[random.choice([0, len(text)-1])]
-                print current_text
-                main(app_key, app_secret, callback_url, current_text, mid)
-
-            print content
-            print mid
-
-            time.sleep(3600)
-
-        except Exception as e:
-            print e
-
-        finally:
-            print('---------我是分割线------------')
 
