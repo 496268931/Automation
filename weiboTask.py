@@ -328,9 +328,9 @@ def review(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid):
     print '剩余时间为: %d'%current_expire_in
 
 
-    if current_expire_in < 5:#如果有效期小于五秒钟，更新token
+    if current_expire_in < 10:#如果有效期小于五秒钟，更新token
         driver = webdriver.Firefox()
-
+        time.sleep(10)
         code = getCode(driver, APP_KEY, CALLBACK_URL, username, password)
         print code
 
@@ -381,7 +381,50 @@ def review(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid):
     #print client.statuses.update.post(status=u'通过Python SDK发微博')
     #print client.friendships.friends.bilateral.ids.get(uid = 5606463752)
 
-def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL):
+
+
+
+def getText(key, userid, content):
+    url = 'http://www.tuling123.com/openapi/api'
+    data = {'key':key,'info':content,'loc':'北京市中关村','userid':userid}
+
+    x = requests.post(url=url, data=data)
+    text = json.loads(x.text)['text']
+
+    return text
+def getKeyWord(content):
+
+    url = 'http://fileload.datagrand.com:8080/ner'
+    data = {'text':content,'types':'person,location,org'}
+
+    x = requests.post(url=url, data=data)
+    print x.text
+    # for i in json.loads(x.text)['person']:
+    #     print i
+    y = json.loads(x.text)
+
+
+    # if y['person'] and y['location']:
+    #     keyword = y['person'][0] + y['location'][0]
+    # elif y['person'] and not(y['location']):
+    #     keyword = y['person'][0]
+    # elif not(y['person']) and y['location']:
+    #     keyword = y['location'][0]
+
+    j = ''
+    if y['person']:
+        for i in y['person']:
+            j = j + i
+        keyword = j
+    else:
+        keyword = '空'
+    print u'提取的关键词为: ' +keyword
+    return keyword
+
+
+
+def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
+
     y = requests.get('https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text
     yy = json.loads(y)
 
@@ -395,20 +438,30 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL):
     content = yy['statuses'][0]['text']
     mid = yy['statuses'][0]['mid']
 
-    content = u'微博博'
+    content = u'随便一个内容，为了每次启动程序就能评论'
     print content
     print mid
     print '======================首次检测==========================='
     # print yy['statuses'][0]['user']
     # print yy['statuses'][0]['user']['screen_name']
-    # print yy['statuses'][0]['user']['followers_count']
-
-
-    #text = '我评论某条评论的评论- - '
-    #comment(app_key, app_secret, callback_url, text, 4161078537640995)
+    # print yy['statuses'][0]['user']['followers_count'
 
     #while True:
-    text = ['持续关注这个话题！','这个微博的内容我都好喜欢啊','不错','每天一顶','我现在只关心鹿关啥时候分','非常好','哇塞，还有这么厉害的电影攻略微博']
+    text = [
+        '持续关注这个话题！',
+        '这个微博的内容我都好喜欢啊',
+        '不错',
+        '每天一顶',
+        '我现在只关心鹿关啥时候分',
+        '非常好',
+        '哇塞，还有这么厉害的电影攻略微博',
+        '互联网时代，用大数据说话',
+        '大数据不错，干货满满 ',
+        '很认真的一篇分析',
+        '虽然有一点不足，但看的出来是在认真做作品',
+        '想问下博主数据来源',
+        '情绪地图对于媒体人来说是福音啊'
+    ]
     for i in range(1, 10000000):
         print('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         try:
@@ -424,14 +477,28 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL):
                 mid = json.loads(requests.get(
                     'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['mid']
 
-                current_text = text[random.choice([0, len(text)-1])]
-                print current_text
+                keyword = getKeyWord(content)
+
+
+
+
+
+                if keyword==u'空':
+                    current_text = text[random.choice([0, len(text)-1])]
+                else:
+                    current_text = getText(key, userid, keyword)
+
+                print u'本次评论内容为: ' + current_text
+
+
+
+
                 review(APP_KEY, APP_SECRET, CALLBACK_URL, current_text, mid)
 
             print content
             print mid
 
-            time.sleep(900)
+            time.sleep(1800)
 
         except Exception as e:
             print e
@@ -443,6 +510,12 @@ if __name__ == '__main__':
     app_key = '2260324575' ## 填写应用程序的信息
     app_secret = 'fb8ec84988227c4cb6fd6b4f5091b7a1'
     callback_url = 'http://vpiao.wiseweb.com.cn/authformweibo'
+
+    key = 'c572878ae4774d8f94ae14a59b39562c'
+    userid = '496268931@qq.com'
+
+
+
     #APP_KEY = '1851011061' ## 填写应用程序的信息
     #APP_SECRET = '4f46048f5c6d1bb1038a0b379bda30b8'
     #CALLBACK_URL = 'https://api.weibo.com/oauth2/default.html'
@@ -496,6 +569,6 @@ if __name__ == '__main__':
     #
     # print '----------------------'
 
-    monitorandcomment(app_key, app_secret, callback_url)
+    monitorandcomment(app_key, app_secret, callback_url, key, userid)
 
 

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+import re
+
 from bs4 import BeautifulSoup
 
 html = """
@@ -8,6 +11,8 @@ html = """
 <a href="http://example.com/elsie" class="sister" id="link1"><!-- Elsie --></a>,
 <a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
 <a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
+<a href="http://view/123.com/tillie" class="sister" id="link3">Tillie</a>;
+<a href="http://view/456.com/tillie" class="sister" id="link3">Tillie</a>;
 and they lived at the bottom of a well.</p>
 <p class="story">...</p>
 """
@@ -15,6 +20,21 @@ and they lived at the bottom of a well.</p>
 soup = BeautifulSoup(html, "html.parser" )
 
 soup = BeautifulSoup(open('index.html'), "html.parser" )
+
+
+# 搜索节点（find_all,find）
+# 方法：fand_all(name,attrs,string)
+# 查找所有标签为a的节点
+print soup.find_all('a')
+
+#查找所有标签为a，链接符合/example/123.com形式的的节点
+print soup.find_all('a',href='/view/123.com')
+print soup.find_all('a',href=re.compile(r'/view/\d+\.com'))
+
+#查找所有标签为div，class为sister，文字为Lacie的节点
+print soup.find_all('a',class_='sister',string='Lacie')
+
+print
 
 #print soup.prettify()
 #Tag
