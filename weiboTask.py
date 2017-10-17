@@ -2,6 +2,7 @@
 import base64
 import json
 import random
+
 import time
 
 import os
@@ -14,10 +15,7 @@ import requests
 import weibo
 from PIL import Image
 from selenium import webdriver
-import urllib
-import urllib2
 
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 
 from com.aliyun.api.gateway.sdk.util import showapi
@@ -69,98 +67,97 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
         time.sleep(4)
 
 
+    if isElementExist('//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/span/img', driver):
+        if driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/span/img').is_displayed():# 如果存在验证码图片
+            i = 0
+            while i < 6:
+                print('有验证码')
+                print(i)
 
-    if driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/span/img').is_displayed():# 如果存在验证码图片
-        i = 0
-        while i < 6:
-            print('有验证码')
-            print(i)
-
-            picName = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '', str(datetime.datetime.now())) + '.png'
-            driver.save_screenshot(picName)
-            time.sleep(1)
-
-            # 裁切图片
-            img = Image.open(picName)
-
-            region = (1095, 208, 1169, 240)
-            cropImg = img.crop(region)
-
-            # 保存裁切后的图片
-            picNameCut = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '', str(
-                datetime.datetime.now())) + '.png'
-            cropImg.save(picNameCut)
-            time.sleep(2)
-
-            # 进行验证码验证
-            f = open(picNameCut, 'rb')
-            b_64 = base64.b64encode(f.read())
-            f.close()
-            req = showapi.ShowapiRequest("http://ali-checkcode.showapi.com/checkcode",
-                                         "4e5510e696c748ca8d5033dd595bfbbc")
-            json_res = req.addTextPara("typeId", "3050") \
-                .addTextPara("img_base64", b_64) \
-                .addTextPara("convert_to_jpg", "1") \
-                .post()
-
-            # print ('1')
-            # print ('json_res data is:', json_res)
-            print (json_res)
-            json_res
-            # str="{\"showapi_res_code\":0,\"showapi_res_error\":\"\",\"showapi_res_body\":{\"Result\":\"28ht\",\"ret_code\":0,\"Id\":\"adb1c363-d566-48a6-820e-55859428599d\"}}"
-
-            result = json.loads(str(json_res[1:-1]).replace('\\', ''))
-            yanzhengma = result['showapi_res_body']['Result']
-
-
-            print(yanzhengma)
-
-            time.sleep(1)
-
-            os.remove(picName)
-            time.sleep(1)
-            os.remove(picNameCut)
-            time.sleep(1)
-
-            driver.find_element_by_xpath(
-                '//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/input').click()
-            time.sleep(1)
-            driver.find_element_by_xpath(
-                '//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/input').clear()
-            time.sleep(1)
-            driver.find_element_by_xpath(
-                '//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/input').send_keys(
-                yanzhengma)
-            time.sleep(3)
-
-            #点击登录
-            driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]').click()
-            time.sleep(8)
-
-            if driver.current_url == 'https://api.weibo.com/oauth2/authorize':
-                print('点击授权')
+                picName = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '', str(datetime.datetime.now())) + '.png'
+                driver.save_screenshot(picName)
                 time.sleep(1)
-                driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]').click()
-                time.sleep(4)
 
-            if driver.current_url.find('code=') >= 0:
-                print('授权回调页返回code')
-                break
-            if i == 5:
-                print('验证码识别次数超过三次，取消本次授权')
-                break
-            i = i+1
-    # else:
-    #     print('没有验证码')
-    #     #点击登录
-    #
-    #     driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]').click()
-    #     time.sleep(8)
-    #     if driver.current_url == 'https://api.weibo.com/oauth2/authorize':
-    #         print('点击授权')
-    #         time.sleep(1)
-    #         driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]').click()
-    #         time.sleep(4)
+                # 裁切图片
+                img = Image.open(picName)
+
+                region = (1095, 208, 1169, 240)
+                cropImg = img.crop(region)
+
+                # 保存裁切后的图片
+                picNameCut = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '', str(
+                    datetime.datetime.now())) + '.png'
+                cropImg.save(picNameCut)
+                time.sleep(2)
+
+                # 进行验证码验证
+                f = open(picNameCut, 'rb')
+                b_64 = base64.b64encode(f.read())
+                f.close()
+                req = showapi.ShowapiRequest("http://ali-checkcode.showapi.com/checkcode",
+                                         "4e5510e696c748ca8d5033dd595bfbbc")
+                json_res = req.addTextPara("typeId", "3050") \
+                    .addTextPara("img_base64", b_64) \
+                    .addTextPara("convert_to_jpg", "1") \
+                    .post()
+
+                # print ('1')
+                # print ('json_res data is:', json_res)
+                print (json_res)
+                json_res
+                # str="{\"showapi_res_code\":0,\"showapi_res_error\":\"\",\"showapi_res_body\":{\"Result\":\"28ht\",\"ret_code\":0,\"Id\":\"adb1c363-d566-48a6-820e-55859428599d\"}}"
+
+                result = json.loads(str(json_res[1:-1]).replace('\\', ''))
+                yanzhengma = result['showapi_res_body']['Result']
+
+
+                print(yanzhengma)
+
+                time.sleep(1)
+
+                os.remove(picName)
+                time.sleep(1)
+                os.remove(picNameCut)
+                time.sleep(1)
+
+                driver.find_element_by_xpath(
+                    '//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/input').click()
+                time.sleep(1)
+                driver.find_element_by_xpath(
+                    '//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/input').clear()
+                time.sleep(1)
+                driver.find_element_by_xpath(
+                    '//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/input').send_keys(yanzhengma)
+                time.sleep(3)
+
+                #点击登录
+                driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]').click()
+                time.sleep(8)
+
+                if driver.current_url == 'https://api.weibo.com/oauth2/authorize':
+                    print('点击授权')
+                    time.sleep(1)
+                    driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]').click()
+                    time.sleep(4)
+
+                if driver.current_url.find('code=') >= 0:
+                    print('授权回调页返回code')
+                    break
+                if i == 5:
+                    print('验证码识别次数超过三次，取消本次授权')
+                    break
+                i = i+1
+        # else:
+        #     print('没有验证码')
+        #     #点击登录
+        #
+        #     driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]').click()
+        #     time.sleep(8)
+        #     if driver.current_url == 'https://api.weibo.com/oauth2/authorize':
+        #         print('点击授权')
+        #         time.sleep(1)
+        #         driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]').click()
+        #         time.sleep(4)
 
 
 
@@ -177,7 +174,7 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
     return code
 
 
-def getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL):
+def getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL):#首次添加账号获取token
     values = {'client_id': APP_KEY, 'client_secret': APP_SECRET, 'grant_type': 'authorization_code',
               'code': code, 'redirect_uri': CALLBACK_URL}
     # data = urllib.urlencode(values)
@@ -200,6 +197,53 @@ def getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL):
 
     #{"access_token":"2.00i1J7HGHXeQBC1853323ba30a4yU_","remind_in":"145653","expires_in":145653,
     # "uid":"5606463752"}
+
+def getToken(APP_KEY, APP_SECRET, CALLBACK_URL, platform):
+    #platform = 'XX微博'
+    account_info = get_account(platform)
+    print account_info  #<type 'dict'>
+
+
+    username= account_info['data']['accountId']
+    password = account_info['data']['password']
+    print username
+    print password
+
+
+    #print type(account_info['data']['data'])
+    if type(account_info['data']['data']) == unicode:
+        access_token = json.loads(account_info['data']['data'])['access_token']
+        expires_in = json.loads(account_info['data']['data'])['expires_in']
+    elif type(account_info['data']['data']) == dict:
+        access_token = account_info['data']['data']['access_token']
+        expires_in = account_info['data']['data']['expires_in']
+
+
+    print access_token
+    print expires_in
+
+
+    r = requests.post('https://api.weibo.com/oauth2/get_token_info', data={'access_token': access_token})
+    #print type(r.text)  #<type 'unicode'>
+    #print type(r.content)   #<type 'str'>
+    current_expire_in = json.loads(r.text)['expire_in']
+    print '剩余时间为: %d'%current_expire_in
+
+
+    if current_expire_in < 10:#如果有效期小于五秒钟，更新token
+        driver = webdriver.Firefox()
+        time.sleep(10)
+        code = getCode(driver, APP_KEY, CALLBACK_URL, username, password)
+        print code
+
+        response_dirctory = getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL)
+        print response_dirctory
+        #print type(response_dirctory)   #<type 'dict'>
+
+        update_cookies(username, password, response_dirctory, platform)
+        # print type(account_info['data']['data'])
+
+    return access_token, expires_in
 
 def add_account(username, password, APP_KEY, APP_SECRET, CALLBACK_URL, platform, num):
     # accountId = '18513199891'
@@ -240,8 +284,8 @@ def add_account(username, password, APP_KEY, APP_SECRET, CALLBACK_URL, platform,
     driver = webdriver.Firefox(firefox_profile=profile)
 
 
-    driver.get('http://httpbin.org/ip')
-    time.sleep(3)
+    #driver.get('http://httpbin.org/ip')
+    #time.sleep(3)
     code = getCode(driver, APP_KEY, CALLBACK_URL, username, password)
     print code
 
@@ -268,10 +312,10 @@ def get_account(platform):
 
     return r
 
-def update_cookies(username, password, response_dirctory):
+def update_cookies(username, password, response_dirctory, platform):
     url = 'http://114.215.170.176:4000/update-account'
     req = requests.post(url, data={'accountId': username, 'password': password, 'platform':
-        '微博', 'data': json.JSONEncoder().encode(response_dirctory)})
+        platform, 'data': json.JSONEncoder().encode(response_dirctory)})
     print req.text
 
 
@@ -297,51 +341,51 @@ def review(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid):
     # add_account('18354254831', 'pp9999', APP_KEY, APP_SECRET, CALLBACK_URL, '微博')
     # time.sleep(100)
 
-
-    account_info = get_account('评论微博')
-    print account_info  #<type 'dict'>
-
-
-    username= account_info['data']['accountId']
-    password = account_info['data']['password']
-    print username
-    print password
-
-
-    #print type(account_info['data']['data'])
-    if type(account_info['data']['data']) == unicode:
-        access_token = json.loads(account_info['data']['data'])['access_token']
-        expires_in = json.loads(account_info['data']['data'])['expires_in']
-    elif type(account_info['data']['data']) == dict:
-        access_token = account_info['data']['data']['access_token']
-        expires_in = account_info['data']['data']['expires_in']
-
-
-    print access_token
-    print expires_in
-
-
-    r = requests.post('https://api.weibo.com/oauth2/get_token_info', data={'access_token': access_token})
-    #print type(r.text)  #<type 'unicode'>
-    #print type(r.content)   #<type 'str'>
-    current_expire_in = json.loads(r.text)['expire_in']
-    print '剩余时间为: %d'%current_expire_in
-
-
-    if current_expire_in < 10:#如果有效期小于五秒钟，更新token
-        driver = webdriver.Firefox()
-        time.sleep(10)
-        code = getCode(driver, APP_KEY, CALLBACK_URL, username, password)
-        print code
-
-        response_dirctory = getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL)
-        print response_dirctory
-        #print type(response_dirctory)   #<type 'dict'>
-
-        update_cookies(username, password, response_dirctory)
-        # print type(account_info['data']['data'])
-
-
+    # plat_from = '评论微博'
+    # account_info = get_account(plat_from)
+    # print account_info  #<type 'dict'>
+    #
+    #
+    # username= account_info['data']['accountId']
+    # password = account_info['data']['password']
+    # print username
+    # print password
+    #
+    #
+    # #print type(account_info['data']['data'])
+    # if type(account_info['data']['data']) == unicode:
+    #     access_token = json.loads(account_info['data']['data'])['access_token']
+    #     expires_in = json.loads(account_info['data']['data'])['expires_in']
+    # elif type(account_info['data']['data']) == dict:
+    #     access_token = account_info['data']['data']['access_token']
+    #     expires_in = account_info['data']['data']['expires_in']
+    #
+    #
+    # print access_token
+    # print expires_in
+    #
+    #
+    # r = requests.post('https://api.weibo.com/oauth2/get_token_info', data={'access_token': access_token})
+    # #print type(r.text)  #<type 'unicode'>
+    # #print type(r.content)   #<type 'str'>
+    # current_expire_in = json.loads(r.text)['expire_in']
+    # print '剩余时间为: %d'%current_expire_in
+    #
+    #
+    # if current_expire_in < 10:#如果有效期小于五秒钟，更新token
+    #     driver = webdriver.Firefox()
+    #     time.sleep(10)
+    #     code = getCode(driver, APP_KEY, CALLBACK_URL, username, password)
+    #     print code
+    #
+    #     response_dirctory = getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL)
+    #     print response_dirctory
+    #     #print type(response_dirctory)   #<type 'dict'>
+    #
+    #     update_cookies(username, password, response_dirctory, plat_from)
+    #     # print type(account_info['data']['data'])
+    print '本次使用的评论微博信息为: '
+    access_token, expires_in = getToken(APP_KEY, APP_SECRET, CALLBACK_URL, '评论微博')
 
 
 
@@ -418,15 +462,14 @@ def getKeyWord(content):
         keyword = j
     else:
         keyword = '空'
-    print u'提取的关键词为: ' +keyword
+    print '提取的关键词为: ' +keyword
     return keyword
 
 
 
 def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
 
-    y = requests.get('https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text
-    yy = json.loads(y)
+
 
     # print yy
     # print len(yy['statuses'])
@@ -435,12 +478,13 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
     #     print i['text']
     #     print i['user']['screen_name']
 
-    content = yy['statuses'][0]['text']
-    mid = yy['statuses'][0]['mid']
+
+    # content = yy['statuses'][0]['text']
+    # mid = yy['statuses'][0]['mid']
 
     content = u'随便一个内容，为了每次启动程序就能评论'
     print content
-    print mid
+    # print mid
     print '======================首次检测==========================='
     # print yy['statuses'][0]['user']
     # print yy['statuses'][0]['user']['screen_name']
@@ -465,40 +509,57 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
     for i in range(1, 10000000):
         print('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         try:
-            if content == json.loads(requests.get(
-                    'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['text']:
-                print '没有最新微博'
+            print '本次使用的监测微博信息为: '
+            access_token, expires_in = getToken(APP_KEY, APP_SECRET, CALLBACK_URL, '监测微博')
 
+            y = requests.get('https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': access_token}).text
+            yy = json.loads(y)
+
+            print yy
+            if 'error' in yy.keys():
+                print yy['error']
+                print '访问过于频繁，等待一小时后重试'
+                time.sleep(3600)
             else:
 
-                print '有最新微博'
-                content = json.loads(requests.get(
-                    'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['text']
-                mid = json.loads(requests.get(
-                    'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': '2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'}).text)['statuses'][0]['mid']
 
-                keyword = getKeyWord(content)
+                #'2.00rKNXXGzfFy9C49cb5f2b09MaEBVB'
+                # if content == json.loads(requests.get('https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': access_token}).text)['statuses'][0]['text']:
+                if content == yy['statuses'][0]['text']:
+                    print '没有最新微博'
 
-
-
-
-
-                if keyword==u'空':
-                    current_text = text[random.choice([0, len(text)-1])]
                 else:
-                    current_text = getText(key, userid, keyword)
 
-                print u'本次评论内容为: ' + current_text
+                    print '有最新微博'
+                    # content = json.loads(requests.get(
+                    #     'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': access_token}).text)['statuses'][0]['text']
+                    # mid = json.loads(requests.get(
+                    #     'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': access_token}).text)['statuses'][0]['mid']
+                    content = yy['statuses'][0]['text']
+                    mid = yy['statuses'][0]['mid']
 
 
 
+                    for ii in range(1, 8):
+                        print '第 '+str(ii)+ '次评论'
+                        keyword = getKeyWord(content)
 
-                review(APP_KEY, APP_SECRET, CALLBACK_URL, current_text, mid)
+                        if keyword=='空':
+                            #current_text = text[random.choice([0, len(text)-1])]
+                            current_text = random.choice(text)
+                        else:
+                            current_text = getText(key, userid, keyword)
 
-            print content
-            print mid
+                        print '本次评论内容为: ' + current_text
 
-            time.sleep(1800)
+
+                        review(APP_KEY, APP_SECRET, CALLBACK_URL, current_text, mid)
+                        time.sleep(600)
+
+                print content
+                print mid
+
+                time.sleep(3600)
 
         except Exception as e:
             print e
@@ -511,6 +572,7 @@ if __name__ == '__main__':
     app_secret = 'fb8ec84988227c4cb6fd6b4f5091b7a1'
     callback_url = 'http://vpiao.wiseweb.com.cn/authformweibo'
 
+    #图灵机器人
     key = 'c572878ae4774d8f94ae14a59b39562c'
     userid = '496268931@qq.com'
 
@@ -530,23 +592,33 @@ if __name__ == '__main__':
     # password = 'vadjnrwa1701u'
 
 
+
+
+
+
+    #add_account('15975405691', 'asd1588', app_key, app_secret, callback_url, '监测微博', 0)
+    #
     # f = open('weibo.txt')
     # lines = f.readlines()
     # # for line in lines:
     # #     print line
     # f.close()
     #
-    # for num in range(1, 6):
+    # for num in range(3, 6):
     #     # try:
     #         print num
     #         print lines[num-1].split('----')[0]
     #         add_account(lines[num-1].split('----')[0], lines[num-1].split('----')[1], app_key,
     #                     app_secret,
-    #                     callback_url, '斌哥小号', num)
+    #                     callback_url, '评论微博', num)
     #         print '--------分割线--------'
-    #         time.sleep(600)
+    #         time.sleep(5)
     #     # except Exception as e:
     #     #     print e
+
+
+
+
 
 
 

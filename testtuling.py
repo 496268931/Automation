@@ -41,7 +41,7 @@ if __name__ == '__main__':
     # else:
     #     print 234
     # File: readline-example-3.py
-    file = open(u"weibo语料.txt")
+    file = open(u"F:\\影视剧字幕语料库(www.shareditor.com)\\subtitle.corpus")
     while 1:
         lines = file.readlines(100000)
         if not lines:
