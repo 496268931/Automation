@@ -5,7 +5,7 @@ import requests
 
 def getText():
     url = 'http://www.tuling123.com/openapi/api'
-    data = {'key':'c572878ae4774d8f94ae14a59b39562c','info':'豆瓣','loc':'北京市中关村',
+    data = {'key':'c572878ae4774d8f94ae14a59b39562c','info':'这个晚会深深切切的，展示了中国传统文化，也展示了闽南文化可以让我们感受到的。','loc':'北京市中关村',
         'userid':'496268931@qq.com'}
 
     x = requests.post(url=url, data=data)
@@ -16,7 +16,7 @@ def getText():
 def getKeyWord():
 
     url1 = 'http://fileload.datagrand.com:8080/ner'
-    data1 = {'text':'U英伦对决[星星][星星][星星][半星]，成龙大哥余威不减，依然领跑假期档[笑而不语]#虎啸数据#','types':'person,location,org'}
+    data1 = {'text':'觉得预告片有点点像功夫熊猫的，也不知道是不是算抄袭了坐等上映','types':'person,location,org'}
 
     x1 = requests.post(url=url1, data=data1)
     print x1.text
@@ -32,20 +32,26 @@ def getkey():
 
 
 if __name__ == '__main__':
-    # getText()
-    # getKeyWord()
-    # getkey()
+    getText()
+    getKeyWord()
+    #getkey()
     # z = [1]
     # if z:
     #     print 123
     # else:
     #     print 234
-    # File: readline-example-3.py
-    file = open(u"F:\\影视剧字幕语料库(www.shareditor.com)\\subtitle.corpus")
-    while 1:
-        lines = file.readlines(100000)
-        if not lines:
-            break
-        for line in lines:
-            print line
-            # pass # do something
+
+
+
+    # # File: readline-example-3.py
+    # file = open(u"E:\\创意.txt")
+    # while 1:
+    #     lines = file.readlines(100000)
+    #     if not lines:
+    #         break
+    #     for line in lines:
+    #
+    #         if line !='\t':
+    #
+    #             print line
+    #         # pass # do something

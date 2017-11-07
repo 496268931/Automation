@@ -436,7 +436,7 @@ def commentWeibo(client, comment, rid):
     #print type(s)   #<class 'weibo.JsonDict'>
     return s
 
-def review(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid):
+def review(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid, platform):
 
     # add_account('18354254831', 'pp9999', APP_KEY, APP_SECRET, CALLBACK_URL, '微博')
     # time.sleep(100)
@@ -485,7 +485,7 @@ def review(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid):
     #     update_cookies(username, password, response_dirctory, plat_from)
     #     # print type(account_info['data']['data'])
     print '本次使用的评论微博信息为: '
-    access_token, expires_in = getToken(APP_KEY, APP_SECRET, CALLBACK_URL, '评论微博')
+    access_token, expires_in = getToken(APP_KEY, APP_SECRET, CALLBACK_URL, platform)
 
 
 
@@ -715,6 +715,14 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
                     # print mid
                     #
                     nums = count('评论微博')
+
+                    current_platform = '评论微博'
+
+
+
+
+
+
                     for ii in range(1, nums+1):
                         print '-------第 '+str(ii)+ '次评论--------'
                         keyword = getKeyWord(content)
@@ -730,11 +738,13 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
 
 
                         try:
-                            review(APP_KEY, APP_SECRET, CALLBACK_URL, current_text, mid)
+                            review(APP_KEY, APP_SECRET, CALLBACK_URL, current_text, mid, current_platform)
                             print '--------本次评论成功--------'
                         except Exception as e:
                             print e
                             print '本次评论账号有问题'
+                            current_platform = '评论微博备份'
+                            print '用评论微博备份'
                         finally:
                             print('---------评论分界线------------')
                         time.sleep(15)
@@ -742,7 +752,7 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
                 print content
                 print mid
 
-                time.sleep(3600)
+                time.sleep(7200)
 
         # except Exception as e:
         #     print e
@@ -779,7 +789,7 @@ if __name__ == '__main__':
 
 
 
-    # add_account('17160392970', 'asd55333', app_key, app_secret, callback_url, '评论微博')
+    # add_account('18328514791', 'asd55333', app_key, app_secret, callback_url, '评论微博备份')
     #
 
     # f = open('weibo.txt')
