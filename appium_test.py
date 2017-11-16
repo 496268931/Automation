@@ -26,7 +26,7 @@ d2 = '461dcf4'
 desired_caps1 = {}
 desired_caps1['platformName'] = 'Android'
 desired_caps1['platformVersion'] = '4.4.2'
-desired_caps1['deviceName'] = d1
+desired_caps1['deviceName'] = 'device1'
 desired_caps1['udid'] = d1
 desired_caps1['appPackage'] = 'com.sina.weibo'
 desired_caps1['appActivity'] = 'com.sina.weibo.SplashActivity'
@@ -38,8 +38,8 @@ desired_caps1['resetKeyboard'] = 'True'
 desired_caps2 = {}
 desired_caps2['platformName'] = 'Android'
 desired_caps2['platformVersion'] = '4.4.2'
-desired_caps2['deviceName'] = d2
-desired_caps1['udid'] = d2
+desired_caps2['deviceName'] = 'device2'
+desired_caps2['udid'] = d2
 desired_caps2['appPackage'] = 'com.sina.weibo'
 desired_caps2['appActivity'] = 'com.sina.weibo.SplashActivity'
 desired_caps2['unicodeKeyboard'] = 'True'
@@ -122,7 +122,7 @@ def sendWeibo(driver):
                     json_res
                     # str="{\"showapi_res_code\":0,\"showapi_res_error\":\"\",\"showapi_res_body\":{\"Result\":\"28ht\",\"ret_code\":0,\"Id\":\"adb1c363-d566-48a6-820e-55859428599d\"}}"
 
-                    result = json.loads(str(json_res[1:-1]).replace('\\', ''))
+                    result = json.loads(str(json_res[1:-3]).replace('\\', ''))
                     yanzhengma = result['showapi_res_body']['Result']
 
 
@@ -211,7 +211,7 @@ def sendWeibo(driver):
                     json_res
                     # str="{\"showapi_res_code\":0,\"showapi_res_error\":\"\",\"showapi_res_body\":{\"Result\":\"28ht\",\"ret_code\":0,\"Id\":\"adb1c363-d566-48a6-820e-55859428599d\"}}"
 
-                    result = json.loads(str(json_res[1:-1]).replace('\\', ''))
+                    result = json.loads(str(json_res[1:-3]).replace('\\', ''))
                     yanzhengma = result['showapi_res_body']['Result']
 
 
@@ -260,13 +260,49 @@ def sendWeibo(driver):
 
     driver.quit()
 
+def forwardWeibo(driver, deviceName):
+    os.system('adb -s ' + deviceName +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d  sinaweibo://detail?mblogid=4173987502094550')
+    time.sleep(2)
 
-threads = []
-t1 = threading.Thread(target=sendWeibo,args=(webdriver.Remote('http://localhost:4723/wd/hub', desired_caps1),))
-threads.append(t1)
-t2 = threading.Thread(target=sendWeibo,args=(webdriver.Remote('http://localhost:4730/wd/hub', desired_caps2),))
-threads.append(t2)
+    driver.find_element_by_id('com.sina.weibo:id/forward').click()
+    time.sleep(2)
+    driver.find_element_by_id('com.sina.weibo:id/edit_view').send_keys(u'今天天气不错呢')
+    time.sleep(2)
+    driver.find_element_by_id('com.sina.weibo:id/titleSave').click()
+    time.sleep(2)
 
+
+def commentWeibo(driver, deviceName):
+    os.system('adb -s ' + deviceName +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d  sinaweibo://detail?mblogid=4173987502094550')
+    time.sleep(2)
+    driver.find_element_by_id('com.sina.weibo:id/comment').click()
+    time.sleep(2)
+    driver.find_element_by_id('com.sina.weibo:id/edit_view').send_keys(u'今天天气不错呢')
+    time.sleep(2)
+    driver.find_element_by_id('com.sina.weibo:id/titleSave').click()
+    time.sleep(2)
+
+
+def praiseWeibo(driver, deviceName):
+    os.system('adb -s ' + deviceName +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=4173987502094550')
+    time.sleep(2)
+    driver.find_element_by_id('com.sina.weibo:id/liked').click()
+    time.sleep(2)
+
+
+# t1 = threading.Thread(target=sendWeibo,args=(webdriver.Remote('http://localhost:4723/wd/hub', desired_caps1),))
+# threads.append(t1)
+# t2 = threading.Thread(target=sendWeibo,args=(webdriver.Remote('http://localhost:4730/wd/hub', desired_caps2),))
+# threads.append(t2)
+
+
+
+# execute command, and return the output
+def execCmd(cmd):
+    r = os.popen(cmd)
+    text = r.read()
+    r.close()
+    return text
 def main():
     # driver1 = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps1)
     # sendWeibo(driver1)
@@ -276,12 +312,45 @@ def main():
     # sendWeibo(driver2)
 
 
+    start1 = 'start /b D:\\ProgramFiles\\appium\\Appium\\node.exe D:\\ProgramFiles\\appium\\Appium\\node_modules\\appium\\lib\\server\\main.js --address 127.0.0.1 --port 4723  --bootstrap-port 4780'
+    start2 = 'start /b D:\\ProgramFiles\\appium\\Appium\\node.exe D:\\ProgramFiles\\appium\\Appium\\node_modules\\appium\\lib\\server\\main.js --address 127.0.0.1 --port 4724  --bootstrap-port 4781'
 
-    for t in threads:
-        t.setDaemon(True)
-        t.start()
 
-    t.join()
+    t_appiums = []
+    t_appium1 = threading.Thread(target=execCmd,args=(start1,))
+    t_appiums.append(t_appium1)
+    t_appium2 = threading.Thread(target=execCmd,args=(start2,))
+    t_appiums.append(t_appium2)
+    for x in t_appiums:
+        print '---'
+        x.setDaemon(True)
+        x.start()
+    # x.join()
+
+    time.sleep(15)
+    print 'appium服务已启动'
+
+    driver1 = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps1)
+    time.sleep(10)
+    driver2 = webdriver.Remote('http://localhost:4724/wd/hub', desired_caps2)
+    time.sleep(10)
+
+    print 'xxxxxxxxxx'
+
+    threads = []
+    thread1 = threading.Thread(target=forwardWeibo,args=(driver1,desired_caps1['udid']))
+    threads.append(thread1)
+    thread2 = threading.Thread(target=praiseWeibo,args=(driver2,desired_caps2['udid']))
+    threads.append(thread2)
+
+    print 'xxxxxxxxxx'
+    time.sleep(5)
+    for y in threads:
+
+        y.start()
+        time.sleep(5)
+
+    y.join()
 
     print "all over %s" % time.ctime()
 

@@ -114,7 +114,7 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
                 json_res
                 # str="{\"showapi_res_code\":0,\"showapi_res_error\":\"\",\"showapi_res_body\":{\"Result\":\"28ht\",\"ret_code\":0,\"Id\":\"adb1c363-d566-48a6-820e-55859428599d\"}}"
 
-                result = json.loads(str(json_res[1:-1]).replace('\\', ''))
+                result = json.loads(str(json_res[1:-3]).replace('\\', ''))
                 yanzhengma = result['showapi_res_body']['Result']
 
 
@@ -678,8 +678,8 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
 
     ]
     for i in range(1, 10000000):
-        # print('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        # try:
+        print('==========本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+'==========')
+        try:
             print '本次使用的监测微博信息为: '
             access_token, expires_in = getToken(APP_KEY, APP_SECRET, CALLBACK_URL, '监测微博')
             y = requests.get('https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': access_token}).text
@@ -752,13 +752,13 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
                 print content
                 print mid
 
-                time.sleep(7200)
+                time.sleep(10800)
 
-        # except Exception as e:
-        #     print e
-        #
-        # finally:
-        #     print('---------我是分割线------------')
+        except Exception as e:
+            print e
+
+        finally:
+            print('---------我是分割线------------')
 if __name__ == '__main__':
     print('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     app_key = '2260324575' ## 填写应用程序的信息

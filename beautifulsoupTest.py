@@ -15,6 +15,7 @@ html = """
 <a href="http://view/456.com/tillie" class="sister" id="link3">Tillie</a>;
 and they lived at the bottom of a well.</p>
 <p class="story">...</p>
+</body>
 """
 
 soup = BeautifulSoup(html, "html.parser" )
@@ -39,8 +40,13 @@ print
 #print soup.prettify()
 #Tag
 print soup.title
+print soup.title.string
 #<title>The Dormouse's story</title>
 
+print soup.body.contents
+for i in soup.body.contents:
+    print i.string
+print
 
 print soup.head
 #<head><title>The Dormouse's story</title></head>
