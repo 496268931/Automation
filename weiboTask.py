@@ -718,7 +718,7 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
                     #
                     nums = count('评论微博')
 
-                    current_platform = '评论微博'
+
 
 
 
@@ -727,6 +727,7 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
 
                     for ii in range(1, nums+1):
                         print '-------第 '+str(ii)+ '次评论--------'
+                        current_platform = '评论微博'
                         keyword = getKeyWord(content)
 
                         if keyword==u'空':
@@ -745,8 +746,9 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
                         except Exception as e:
                             print e
                             print '本次评论账号有问题'
-                            current_platform = '评论微博备份'
-                            print '用评论微博备份'
+                            # current_platform = '评论微博备份'
+
+                            # review(APP_KEY, APP_SECRET, CALLBACK_URL, current_text, mid, '评论微博备份')
                         finally:
                             print('---------评论分界线------------')
                         time.sleep(15)
@@ -800,10 +802,12 @@ if __name__ == '__main__':
     # #     print line
     # f.close()
     #
-    # for num in range(1, 4):
+    # for num in range(1, 6):
     #     # try:
     #         print num
     #         print lines[num-1].split('----')[0]
+    #         print lines[num-1].split('----')[1]
+    #         print '------'
     #         add_account(lines[num-1].split('----')[0], lines[num-1].split('----')[1], app_key, app_secret, callback_url, '评论微博')
     #         print '--------分割线--------'
     #         time.sleep(5)
