@@ -1,4 +1,6 @@
 #coding=utf-8
+import  utf8Togbk
+
 import base64
 import json
 import random
@@ -6,17 +8,11 @@ import re
 import socket
 import threading
 import time
-
 import os
-from telnetlib import EC
-
 import datetime
-
 from PIL import Image
 from appium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-
 from com.aliyun.api.gateway.sdk.util import showapi
 
 PATH=lambda p:os.path.abspath(os.path.join(os.path.dirname(__file__),p))

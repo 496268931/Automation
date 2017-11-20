@@ -1,4 +1,7 @@
 # coding=utf-8
+import utf8Togbk
+
+
 import base64
 import json
 import random
