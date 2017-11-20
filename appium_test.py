@@ -1,7 +1,9 @@
 #coding=utf-8
 import base64
 import json
+import random
 import re
+import socket
 import threading
 import time
 
@@ -18,33 +20,17 @@ from selenium.webdriver.support.wait import WebDriverWait
 from com.aliyun.api.gateway.sdk.util import showapi
 
 PATH=lambda p:os.path.abspath(os.path.join(os.path.dirname(__file__),p))
-
-
-d1 = '03d61be113b3d502'
-d2 = '461dcf4'
-
-desired_caps1 = {}
-desired_caps1['platformName'] = 'Android'
-desired_caps1['platformVersion'] = '4.4.2'
-desired_caps1['deviceName'] = 'device1'
-desired_caps1['udid'] = d1
-desired_caps1['appPackage'] = 'com.sina.weibo'
-desired_caps1['appActivity'] = 'com.sina.weibo.SplashActivity'
-desired_caps1['unicodeKeyboard'] = 'True'
-desired_caps1['resetKeyboard'] = 'True'
 #desired_caps['app'] = PATH('E:\\虎啸\\appiumTest\\CalculatorSuper.apk')
-# driver1 = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps1)
 
-desired_caps2 = {}
-desired_caps2['platformName'] = 'Android'
-desired_caps2['platformVersion'] = '4.4.2'
-desired_caps2['deviceName'] = 'device2'
-desired_caps2['udid'] = d2
-desired_caps2['appPackage'] = 'com.sina.weibo'
-desired_caps2['appActivity'] = 'com.sina.weibo.SplashActivity'
-desired_caps2['unicodeKeyboard'] = 'True'
-desired_caps2['resetKeyboard'] = 'True'
-# driver2 = webdriver.Remote('http://localhost:4724/wd/hub', desired_caps2)
+
+
+# execute command, and return the output
+def execCmd(cmd):
+    r = os.popen(cmd)
+    text = r.read()
+    r.close()
+
+    return text
 
 
 def isElementExist(element, driver):
@@ -58,6 +44,117 @@ def isElementExist(element, driver):
         flag = False
         # driver.execute_script(js)
         return flag
+#open=被占用
+def IsOpen(ip,port):
+    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    try:
+        s.connect((ip,int(port)))
+        s.shutdown(2)
+        print '%d 被占用' % port
+        return True
+    except:
+        print '%d 未被占用' % port
+        return False
+
+def getFreePort():
+
+    while True:
+        random_port = random.randrange(4723,5000)
+
+        if not IsOpen('127.0.0.1', random_port) and not IsOpen('127.0.0.1', random_port + 1) :
+
+
+            return random_port
+
+
+
+
+
+def findAndKill():
+
+    # result1 = execCmd('tasklist /fi "imagename eq 360MobileMgr.exe"')
+    # print result1.decode('gbk')
+    # kill1 = execCmd('taskkill /F /IM 360MobileMgr.exe')
+    # print kill1.decode('gbk')
+    #
+    # result2 = execCmd('tasklist /fi "imagename eq node.exe"')
+    # print result2.decode('gbk')
+    # kill2 = execCmd('taskkill /F /IM node.exe')
+    # print kill2.decode('gbk')
+    #
+    # result3 = execCmd('tasklist /fi "imagename eq adb.exe"')
+    # print result3.decode('gbk')
+    # kill3 = execCmd('taskkill /F /IM adb.exe')
+    # print kill3.decode('gbk')
+
+    print os.popen('tasklist /fi "imagename eq 360MobileMgr.exe"').read().decode('gbk')
+    print os.popen('taskkill /F /IM 360MobileMgr.exe').read().decode('gbk')
+    print os.popen('tasklist /fi "imagename eq node.exe"').read().decode('gbk')
+    print os.popen('taskkill /F /IM node.exe').read().decode('gbk')
+    print os.popen('tasklist /fi "imagename eq adb.exe"').read().decode('gbk')
+    print os.popen('taskkill /F /IM adb.exe').read().decode('gbk')
+
+
+
+findAndKill()
+
+cmd = 'adb devices'
+adb_result = execCmd(cmd).split('\n')
+print adb_result
+# for i in adb_result:
+#
+#     if not i.endswith('\tdevice'):
+#         adb_result.remove(i)
+#     else:
+#         if i.endswith(r'*'):
+#             adb_result.remove(i)
+# print adb_result
+adb_result.pop(0)
+adb_result.pop(0)
+adb_result.pop(0)
+adb_result.pop()
+adb_result.pop()
+
+print adb_result
+# time.sleep(11111)
+
+deviceInfoList = []
+
+# deviceInfoList = [{'desired_cap': {'deviceName': '03d61be113b3d502', 'unicodeKeyboard': 'True', 'udid': '03d61be113b3d502', 'resetKeyboard': 'True', 'platformVersion': '4.4.2', 'appPackage': 'com.sina.weibo', 'platformName': 'Android', 'appActivity': 'com.sina.weibo.SplashActivity'}, 'deviceID': '03d61be113b3d502', 'port': '4973'}, {'desired_cap': {'deviceName': '461dcf4', 'unicodeKeyboard': 'True', 'udid': '461dcf4', 'resetKeyboard': 'True', 'platformVersion': '4.4.2', 'appPackage': 'com.sina.weibo', 'platformName': 'Android', 'appActivity': 'com.sina.weibo.SplashActivity'}, 'deviceID': '461dcf4', 'port': '4854'}]
+
+
+for i in range(len(adb_result)):
+    deviceInfoList.append({'deviceID':adb_result[i].split('\t')[0]})
+print deviceInfoList
+
+
+for i in range(len(deviceInfoList)):
+    deviceInfoList[i]['port'] = str(getFreePort())
+print deviceInfoList
+
+
+for i in range(len(deviceInfoList)):
+
+    desired_caps = {}
+    desired_caps['platformName'] = 'Android'
+    desired_caps['platformVersion'] = '4.4.2'
+    desired_caps['deviceName'] = deviceInfoList[i]['deviceID']
+    desired_caps['udid'] = deviceInfoList[i]['deviceID']
+    desired_caps['appPackage'] = 'com.sina.weibo'
+    desired_caps['appActivity'] = 'com.sina.weibo.SplashActivity'
+    desired_caps['unicodeKeyboard'] = 'True'
+    desired_caps['resetKeyboard'] = 'True'
+    deviceInfoList[i]['desired_cap'] = desired_caps
+    # print desired_caps
+    # print deviceInfoList[i]
+print deviceInfoList
+
+
+
+
+
+
+
 def sendWeibo(driver):
     # driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
 
@@ -260,10 +357,12 @@ def sendWeibo(driver):
 
     driver.quit()
 
-def forwardWeibo(driver, deviceName):
-    os.system('adb -s ' + deviceName +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d  sinaweibo://detail?mblogid=4173987502094550')
-    time.sleep(2)
+def forwardWeibo(current_deviceInfo):
+    driver = webdriver.Remote('http://localhost:' + current_deviceInfo['port'] + '/wd/hub', current_deviceInfo['desired_cap'])
+    time.sleep(10)
 
+    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=4173987502094550')
+    time.sleep(3)
     driver.find_element_by_id('com.sina.weibo:id/forward').click()
     time.sleep(2)
     driver.find_element_by_id('com.sina.weibo:id/edit_view').send_keys(u'今天天气不错呢')
@@ -272,9 +371,13 @@ def forwardWeibo(driver, deviceName):
     time.sleep(2)
 
 
-def commentWeibo(driver, deviceName):
-    os.system('adb -s ' + deviceName +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d  sinaweibo://detail?mblogid=4173987502094550')
-    time.sleep(2)
+def commentWeibo(current_deviceInfo):
+
+    driver = webdriver.Remote('http://localhost:' + current_deviceInfo['port'] + '/wd/hub', current_deviceInfo['desired_cap'])
+    time.sleep(10)
+
+    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=4173987502094550')
+    time.sleep(3)
     driver.find_element_by_id('com.sina.weibo:id/comment').click()
     time.sleep(2)
     driver.find_element_by_id('com.sina.weibo:id/edit_view').send_keys(u'今天天气不错呢')
@@ -283,9 +386,12 @@ def commentWeibo(driver, deviceName):
     time.sleep(2)
 
 
-def praiseWeibo(driver, deviceName):
-    os.system('adb -s ' + deviceName +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=4173987502094550')
-    time.sleep(2)
+def praiseWeibo(current_deviceInfo):
+    driver = webdriver.Remote('http://localhost:' + current_deviceInfo['port'] + '/wd/hub', current_deviceInfo['desired_cap'])
+    time.sleep(10)
+
+    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=4173987502094550')
+    time.sleep(3)
     driver.find_element_by_id('com.sina.weibo:id/liked').click()
     time.sleep(2)
 
@@ -297,12 +403,7 @@ def praiseWeibo(driver, deviceName):
 
 
 
-# execute command, and return the output
-def execCmd(cmd):
-    r = os.popen(cmd)
-    text = r.read()
-    r.close()
-    return text
+
 def main():
     # driver1 = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps1)
     # sendWeibo(driver1)
@@ -312,45 +413,74 @@ def main():
     # sendWeibo(driver2)
 
 
-    start1 = 'start /b D:\\ProgramFiles\\appium\\Appium\\node.exe D:\\ProgramFiles\\appium\\Appium\\node_modules\\appium\\lib\\server\\main.js --address 127.0.0.1 --port 4723  --bootstrap-port 4780'
-    start2 = 'start /b D:\\ProgramFiles\\appium\\Appium\\node.exe D:\\ProgramFiles\\appium\\Appium\\node_modules\\appium\\lib\\server\\main.js --address 127.0.0.1 --port 4724  --bootstrap-port 4781'
+    # start1 = 'start /b D:\\ProgramFiles\\appium\\Appium\\node.exe ' \
+    #          'D:\\ProgramFiles\\appium\\Appium\\node_modules\\appium\\lib\\server\\main.js ' \
+    #          '--address 127.0.0.1 --port ' + deviceInfoList[0]['port'] + '  --bootstrap-port 4780'
+    # start2 = 'start /b D:\\ProgramFiles\\appium\\Appium\\node.exe D:\\ProgramFiles\\appium\\Appium\\node_modules\\appium\\lib\\server\\main.js --address 127.0.0.1 --port ' + \
+    #          deviceInfoList[1]['port'] + '  --bootstrap-port 4781'
+    # print deviceInfoList[0]['port']
+    # print deviceInfoList[1]['port']
+    # t_appiums = []
+    # t_appium1 = threading.Thread(target=execCmd,args=(start1,))
+    # t_appiums.append(t_appium1)
+    # t_appium2 = threading.Thread(target=execCmd,args=(start2,))
+    # t_appiums.append(t_appium2)
 
 
-    t_appiums = []
-    t_appium1 = threading.Thread(target=execCmd,args=(start1,))
-    t_appiums.append(t_appium1)
-    t_appium2 = threading.Thread(target=execCmd,args=(start2,))
-    t_appiums.append(t_appium2)
-    for x in t_appiums:
-        print '---'
-        x.setDaemon(True)
-        x.start()
+
+
+    t_startAppiums = []
+    for j in range(len(deviceInfoList)):
+        start = 'start /b D:\\ProgramFiles\\appium\\Appium\\node.exe ' \
+                 'D:\\ProgramFiles\\appium\\Appium\\node_modules\\appium\\lib\\server\\main.js ' \
+                 '--address 127.0.0.1 --port ' + deviceInfoList[j]['port'] + '  --bootstrap-port ' \
+                                                                             ''+ \
+                str(int(deviceInfoList[j]['port'])+1)
+        t_startAppiums.append(threading.Thread(target=execCmd,args=(start,)))
+
+
+    for t in t_startAppiums:
+        t.setDaemon(True)
+        t.start()
     # x.join()
-
-    time.sleep(15)
+    #启动需要时间，必须等待一段时间
+    time.sleep(8*len(t_startAppiums))
     print 'appium服务已启动'
 
-    driver1 = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps1)
-    time.sleep(10)
-    driver2 = webdriver.Remote('http://localhost:4724/wd/hub', desired_caps2)
-    time.sleep(10)
 
-    print 'xxxxxxxxxx'
 
-    threads = []
-    thread1 = threading.Thread(target=forwardWeibo,args=(driver1,desired_caps1['udid']))
-    threads.append(thread1)
-    thread2 = threading.Thread(target=praiseWeibo,args=(driver2,desired_caps2['udid']))
-    threads.append(thread2)
 
-    print 'xxxxxxxxxx'
-    time.sleep(5)
-    for y in threads:
 
-        y.start()
-        time.sleep(5)
+    task_threads = []
+    for j in range(len(deviceInfoList)):
 
-    y.join()
+        # driver = webdriver.Remote('http://localhost:' + deviceInfo[j]['port'] + '/wd/hub', deviceInfo[j]['desired_cap'])
+
+
+        current_deviceInfo = deviceInfoList[j]
+        print current_deviceInfo
+        thread = threading.Thread(target=praiseWeibo,args=(current_deviceInfo,))
+        task_threads.append(thread)
+
+        print '第 %d 个设备的线程组装完毕' %j
+    print '所有线程组装完毕，开始作业'
+
+    # driver2 = webdriver.Remote('http://localhost:4724/wd/hub', desired_caps2)
+    # time.sleep(10)
+
+    # thread2 = threading.Thread(target=praiseWeibo,args=(driver2,desired_caps2['udid']))
+    # threads.append(thread2)
+
+
+
+    for current_thread in task_threads:
+
+        current_thread.start()
+        print '当前线程启动'
+
+    current_thread.join()
+
+
 
     print "all over %s" % time.ctime()
 
