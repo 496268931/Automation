@@ -45,6 +45,7 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
 
     #driver.get('https://api.weibo.com/oauth2/authorize?response_type=code&client_id=1851011061
     # &redirect_uri=https://api.weibo.com/oauth2/default.html')
+    nickName = username
     driver.get('https://api.weibo.com/oauth2/authorize?response_type=code&client_id='+APP_KEY+'&redirect_uri='+CALLBACK_URL)
 
     driver.maximize_window()
@@ -72,6 +73,11 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
     if driver.current_url == 'https://api.weibo.com/oauth2/authorize':
         print('点击授权')
         time.sleep(1)
+
+        nickName = driver.find_element_by_xpath('/html/body/div/div/div[1]/p/span[1]').text
+        print nickName
+        time.sleep(1)
+
         driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]').click()
         time.sleep(4)
 
@@ -146,6 +152,11 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
                 if driver.current_url == 'https://api.weibo.com/oauth2/authorize':
                     print('点击授权')
                     time.sleep(1)
+
+                    nickName = driver.find_element_by_xpath('/html/body/div/div/div[1]/p/span[1]').text
+                    print nickName
+                    time.sleep(1)
+
                     driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]').click()
                     time.sleep(4)
 
@@ -180,7 +191,7 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
 
     code = current_url[current_url.index('code=')+5:]
 
-    return code
+    return code,nickName
 
 
 def getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL):#首次添加账号获取token
@@ -242,8 +253,9 @@ def getToken(APP_KEY, APP_SECRET, CALLBACK_URL, platform):
     if current_expire_in < 10:#如果有效期小于五秒钟，更新token
         driver = webdriver.Firefox()
         time.sleep(10)
-        code = getCode(driver, APP_KEY, CALLBACK_URL, username, password)
-        print code
+        code, nickName = getCode(driver, APP_KEY, CALLBACK_URL, username, password)
+        print 'code: ' + code
+        print 'nickName: ' + nickName
 
         response_dirctory = getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL)
         print response_dirctory
@@ -388,8 +400,9 @@ def add_account(username, password, APP_KEY, APP_SECRET, CALLBACK_URL, platform,
 
 
 
-    code = getCode(driver, APP_KEY, CALLBACK_URL, username, password)
-    print code
+    code, nickName = getCode(driver, APP_KEY, CALLBACK_URL, username, password)
+    print 'code: ' + code
+    print 'nickName: ' + nickName
 
     response_dirctory = getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL)
     print response_dirctory
@@ -402,7 +415,8 @@ def add_account(username, password, APP_KEY, APP_SECRET, CALLBACK_URL, platform,
     #print type(response_str)  #str
     #print response_str
     url ='http://114.215.170.176:4000/add-account'
-    data = {'accountId': username, 'password': password, "platform": platform, 'data': response_str}
+    data = {'nickName': nickName, 'accountId': username, 'password': password, "platform": platform,
+            'data': response_str}
     s=requests.post(url, data=data)
     print s.text
 def get_account(platform):
@@ -638,7 +652,7 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
         '有更多的干货介绍给我们么？',
         '想看赵丽颖！可爱的颖宝',
         '杨幂大军降临！',
-        '我是黑客，你们赞不了我的，不信试试！',
+        '666666666666666666666',
         '咦？最新电影的实时数据你们竟然也有？厉害了',
         '点个赞',
         '有没有时尚资讯？明星衣着什么的',
