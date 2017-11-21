@@ -177,6 +177,9 @@ buildNumber.properties
 
 logs/
 
+
+weiboTask_log.txt
+ZZZautoReview_douban_log.txt
 geckodriver.log
 com/*
 src/*

@@ -24,6 +24,31 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from com.aliyun.api.gateway.sdk.util import showapi
 
+import logging
+# 第一步，创建一个logger
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)    # Log等级总开关
+# 第二步，创建一个handler，用于写入日志文件
+logfile = 'weiboTask_log.txt'
+fh = logging.FileHandler(logfile, mode='w')
+fh.setLevel(logging.INFO)   # 输出到file的log等级的开关
+# 第三步，再创建一个handler，用于输出到控制台
+ch = logging.StreamHandler()
+ch.setLevel(logging.ERROR)   # 输出到console的log等级的开关
+# 第四步，定义handler的输出格式
+formatter = logging.Formatter("%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s")
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+# 第五步，将logger添加到handler里面
+logger.addHandler(fh)
+logger.addHandler(ch)
+
+
+
+
+
+
+
 
 User_Agent = 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0'
 header = {}
@@ -72,10 +97,12 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
 
     if driver.current_url == 'https://api.weibo.com/oauth2/authorize':
         print('点击授权')
+        logger.info('点击授权')
         time.sleep(1)
 
         nickName = driver.find_element_by_xpath('/html/body/div/div/div[1]/p/span[1]').text
         print nickName
+        logger.info(nickName)
         time.sleep(1)
 
         driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]').click()
@@ -87,8 +114,9 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
             i = 0
             while i < 6:
                 print('有验证码')
+                logger.info('有验证码')
                 print(i)
-
+                logger.info(i)
                 picName = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '', str(datetime.datetime.now())) + '.png'
                 driver.save_screenshot(picName)
                 time.sleep(1)
@@ -119,6 +147,7 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
                 # print ('1')
                 # print ('json_res data is:', json_res)
                 print (json_res)
+                logger.info(json_res)
                 json_res
                 # str="{\"showapi_res_code\":0,\"showapi_res_error\":\"\",\"showapi_res_body\":{\"Result\":\"28ht\",\"ret_code\":0,\"Id\":\"adb1c363-d566-48a6-820e-55859428599d\"}}"
 
@@ -127,7 +156,7 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
 
 
                 print(yanzhengma)
-
+                logger.info(yanzhengma)
                 time.sleep(1)
 
                 os.remove(picName)
@@ -151,10 +180,12 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
 
                 if driver.current_url == 'https://api.weibo.com/oauth2/authorize':
                     print('点击授权')
+                    logger.info('点击授权')
                     time.sleep(1)
 
                     nickName = driver.find_element_by_xpath('/html/body/div/div/div[1]/p/span[1]').text
                     print nickName
+                    logger.info(nickName)
                     time.sleep(1)
 
                     driver.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]').click()
@@ -162,9 +193,11 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
 
                 if driver.current_url.find('code=') >= 0:
                     print('授权回调页返回code')
+                    logger.info('授权回调页返回code')
                     break
                 if i == 5:
                     print('验证码识别次数超过三次，取消本次授权')
+                    logger.info('验证码识别次数超过三次，取消本次授权')
                     break
                 i = i+1
         # else:
@@ -186,8 +219,11 @@ def getCode(driver, APP_KEY, CALLBACK_URL, username, password):
     current_title = driver.title
     # 获取页面url
     current_url = driver.current_url
+
     print current_title
+    logger.info(current_title)
     print current_url
+    logger.info(current_url)
 
     code = current_url[current_url.index('code=')+5:]
 
@@ -222,13 +258,14 @@ def getToken(APP_KEY, APP_SECRET, CALLBACK_URL, platform):
     #platform = 'XX微博'
     account_info = get_account(platform)
     print account_info  #<type 'dict'>
-
+    logger.info(account_info)
 
     username= account_info['data']['accountId']
     password = account_info['data']['password']
     print username
+    logger.info(username)
     print password
-
+    logger.info(password)
 
     #print type(account_info['data']['data'])
     if type(account_info['data']['data']) == unicode:
@@ -240,25 +277,28 @@ def getToken(APP_KEY, APP_SECRET, CALLBACK_URL, platform):
 
 
     print access_token
+    logger.info(access_token)
     print expires_in
-
+    logger.info(expires_in)
 
     r = requests.post('https://api.weibo.com/oauth2/get_token_info', data={'access_token': access_token})
     #print type(r.text)  #<type 'unicode'>
     #print type(r.content)   #<type 'str'>
     current_expire_in = json.loads(r.text)['expire_in']
     print '剩余时间为: %d'%current_expire_in
-
+    logger.info('剩余时间为: %d'%current_expire_in)
 
     if current_expire_in < 10:#如果有效期小于五秒钟，更新token
         driver = webdriver.Firefox()
         time.sleep(10)
         code, nickName = getCode(driver, APP_KEY, CALLBACK_URL, username, password)
         print 'code: ' + code
+        logger.info('code: ' + code)
         print 'nickName: ' + nickName
-
+        logger.info('nickName: ' + nickName)
         response_dirctory = getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL)
         print response_dirctory
+        logger.info(response_dirctory)
         #print type(response_dirctory)   #<type 'dict'>
 
         update_cookies(username, password, response_dirctory, platform)
@@ -296,6 +336,7 @@ def getFreeIp():
             continue
 
     print '代理ip抓取完毕'
+    logger.info('代理ip抓取完毕')
     f.close()
 def getSocketIP():
     #链接服务端ip和端口
@@ -309,6 +350,7 @@ def getSocketIP():
     proxyIP=sk.makefile().readline()
     #打印接受的数据
     print(proxyIP)
+    logger.info(proxyIP)
     #关闭连接
     sk.close()
     return proxyIP
@@ -357,6 +399,7 @@ def add_account(username, password, APP_KEY, APP_SECRET, CALLBACK_URL, platform,
     except:
         # 在整个while循环之内，是我写的抓免费代理ip
         print '通过socket获取IP失败，尝试抓取免费代理IP'
+        logger.info('通过socket获取IP失败，尝试抓取免费代理IP')
         while True:
             try:
                 iplist = ['59.110.159.237:5818', '101.200.76.126:5818', '123.56.228.93:5818',
@@ -368,10 +411,12 @@ def add_account(username, password, APP_KEY, APP_SECRET, CALLBACK_URL, platform,
                     for line in fff.readlines():
                         iplist.append(line)
                 print iplist
+                logger.info(iplist)
                 print len(iplist)
-
+                logger.info(len(iplist))
                 getIP = random.choice(iplist)
                 print getIP
+                logger.info(getIP)
                 ip_ip = getIP.split(":")[0]
                 ip_port = getIP.split(":")[1]
                 # print ip_ip
@@ -379,11 +424,14 @@ def add_account(username, password, APP_KEY, APP_SECRET, CALLBACK_URL, platform,
 
                 #driver.get('http://httpbin.org/ip')
                 print requests.get('http://httpbin.org/ip',proxies={"http": 'http://' + ip_ip +':' + ip_port}).text
+                logger.info(requests.get('http://httpbin.org/ip',proxies={"http": 'http://' + ip_ip +':' + ip_port}).text)
                 time.sleep(3)
                 print '代理可用'
+                logger.info('代理可用')
                 break
             except Exception as e1:
                 print '当前代理不可用，重新选择'
+                logger.info('当前代理不可用，重新选择')
                 continue
 
     profile = webdriver.FirefoxProfile()
@@ -402,11 +450,12 @@ def add_account(username, password, APP_KEY, APP_SECRET, CALLBACK_URL, platform,
 
     code, nickName = getCode(driver, APP_KEY, CALLBACK_URL, username, password)
     print 'code: ' + code
+    logger.info('code: ' + code)
     print 'nickName: ' + nickName
-
+    logger.info('nickName: ' + nickName)
     response_dirctory = getAccessToken(code, APP_KEY, APP_SECRET, CALLBACK_URL)
     print response_dirctory
-
+    logger.info(response_dirctory)
     driver.quit()
     time.sleep(2)
 
@@ -419,6 +468,7 @@ def add_account(username, password, APP_KEY, APP_SECRET, CALLBACK_URL, platform,
             'data': response_str}
     s=requests.post(url, data=data)
     print s.text
+    logger.info(s.text)
 def get_account(platform):
     url = 'http://114.215.170.176:4000/get-account'
     req = requests.get(url, params = {'platform': platform})  #json字符串
@@ -433,7 +483,7 @@ def update_cookies(username, password, response_dirctory, platform):
     req = requests.post(url, data={'accountId': username, 'password': password, 'platform':
         platform, 'data': json.JSONEncoder().encode(response_dirctory)})
     print req.text
-
+    logger.info(req.text)
 
 
 def getWeiboContent(client, uid, i=0):
@@ -501,6 +551,7 @@ def review(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid, platform):
     #     update_cookies(username, password, response_dirctory, plat_from)
     #     # print type(account_info['data']['data'])
     print '本次使用的评论微博信息为: '
+    logger.info('本次使用的评论微博信息为: ')
     access_token, expires_in = getToken(APP_KEY, APP_SECRET, CALLBACK_URL, platform)
 
 
@@ -509,6 +560,7 @@ def review(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid, platform):
     client.set_access_token(access_token, expires_in)
 
     print('-----------')
+    logger.info('-----------')
     #http://open.weibo.com/wiki/2/statuses/share
     #第三方分享一条链接到微博
     #sendweibo = sendWeibo(client, '支持豌豆荚','http://www.wandoujia.com/apps/com.eico.weico ')
@@ -516,19 +568,22 @@ def review(APP_KEY, APP_SECRET, CALLBACK_URL, comment, rid, platform):
 
 
     print('-----------')
+    logger.info('-----------')
     #http://open.weibo.com/wiki/2/comments/create
     #对一条微博进行评论
 
     commentweibo = commentWeibo(client, comment, rid)
     print commentweibo
-
+    logger.info(commentweibo)
     print('-----------')
+    logger.info('-----------')
     #http://open.weibo.com/wiki/2/statuses/user_timeline
     # # 获取某个用户最新发表的微博列表
     # getweibocontent = getWeiboContent(client, 5770961845)
     # print getweibocontent
 
     print('-----------')
+    logger.info('-----------')
     #http://open.weibo.com/wiki/2/users/show
     #获取用户信息
     #userInfo = getuserInfo(client)
@@ -559,6 +614,7 @@ def getKeyWord(content):
 
     x = requests.post(url=url, data=data)
     print x.text
+    logger.info(x.text)
     # for i in json.loads(x.text)['person']:
     #     print i
     y = json.loads(x.text, encoding='utf-8')
@@ -581,6 +637,7 @@ def getKeyWord(content):
     # print type(keyword) #<type 'unicode'>
     # print type('提取的') #<type 'str'>
     print u'提取的关键词为: ' +keyword
+    logger.info(u'提取的关键词为: ' +keyword)
     return keyword
 
 
@@ -601,6 +658,7 @@ def count(platform):
             break
         i = i + 1
     print i
+    logger.info(i)
     return i
 
 
@@ -623,8 +681,10 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
 
     content = u'随便一个内容，为了每次启动程序就能评论'
     print content
+    logger.info(content)
     # print mid
     print '======================首次检测==========================='
+    logger.info('======================首次检测===========================')
     # print yy['statuses'][0]['user']
     # print yy['statuses'][0]['user']['screen_name']
     # print yy['statuses'][0]['user']['followers_count']
@@ -695,19 +755,25 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
     ]
     for i in range(1, 10000000):
         print('==========本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+'==========')
+        logger.info('==========本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+'==========')
         try:
             print '本次使用的监测微博信息为: '
+            logger.info('本次使用的监测微博信息为: ')
             access_token, expires_in = getToken(APP_KEY, APP_SECRET, CALLBACK_URL, '监测微博')
             y = requests.get('https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': access_token}).text
 
 
             yy = json.loads(y)
             print yy
+            logger.info(yy)
             print yy['statuses'][0]['text']
+            logger.info(yy['statuses'][0]['text'])
             time.sleep(1)
             if 'error' in yy.keys():
                 print yy['error']
+                logger.info(yy['error'])
                 print '访问过于频繁，等待一小时后重试'
+                logger.info('访问过于频繁，等待一小时后重试')
                 time.sleep(3600)
             else:
 
@@ -717,10 +783,12 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
                 #print type(yy['statuses'][0]['text'])
                 if content == yy['statuses'][0]['text']:
                     print '没有最新微博'
+                    logger.info('没有最新微博')
 
                 else:
 
                     print '有最新微博'
+                    logger.info('有最新微博')
                     # content = json.loads(requests.get(
                     #     'https://api.weibo.com/2/statuses/home_timeline.json', params={'access_token': access_token}).text)['statuses'][0]['text']
                     # mid = json.loads(requests.get(
@@ -741,6 +809,7 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
 
                     for ii in range(1, nums+1):
                         print '-------第 '+str(ii)+ '次评论--------'
+                        logger.info('-------第 '+str(ii)+ '次评论--------')
                         current_platform = '评论微博'
                         keyword = getKeyWord(content)
 
@@ -751,34 +820,44 @@ def monitorandcomment(APP_KEY, APP_SECRET, CALLBACK_URL, key, userid):
                             current_text = getText(key, userid, keyword)
 
                         print '本次评论内容为: '
+                        logger.info('本次评论内容为: ')
                         print current_text
-
+                        logger.info(current_text)
 
                         try:
                             review(APP_KEY, APP_SECRET, CALLBACK_URL, current_text, mid, current_platform)
                             print '--------本次评论成功--------'
+                            logger.info('--------本次评论成功--------')
                         except Exception as e:
                             print e
+                            logger.error(e)
                             print '本次评论账号有问题'
+                            logger.error('本次评论账号有问题')
                             # current_platform = '评论微博备份'
 
                             # review(APP_KEY, APP_SECRET, CALLBACK_URL, current_text, mid, '评论微博备份')
                         finally:
                             print('---------评论分界线------------')
+                            logger.info('---------评论分界线------------')
                         time.sleep(15)
 
                 print content
+                logger.info(content)
                 print mid
+                logger.info(mid)
 
                 time.sleep(10800)
 
         except Exception as e:
             print e
+            logger.error(e)
 
         finally:
             print('---------我是分割线------------')
+            logger.info('---------我是分割线------------')
 if __name__ == '__main__':
     print('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+    logger.info('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     app_key = '2260324575' ## 填写应用程序的信息
     app_secret = 'fb8ec84988227c4cb6fd6b4f5091b7a1'
     callback_url = 'http://vpiao.wiseweb.com.cn/authformweibo'

@@ -18,6 +18,24 @@ from PIL import Image
 from selenium import webdriver
 
 from com.aliyun.api.gateway.sdk.util import showapi
+import logging
+# 第一步，创建一个logger
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)    # Log等级总开关
+# 第二步，创建一个handler，用于写入日志文件
+logfile = 'ZZZautoReview_douban_log.txt'
+fh = logging.FileHandler(logfile, mode='w')
+fh.setLevel(logging.INFO)   # 输出到file的log等级的开关
+# 第三步，再创建一个handler，用于输出到控制台
+ch = logging.StreamHandler()
+ch.setLevel(logging.ERROR)   # 输出到console的log等级的开关
+# 第四步，定义handler的输出格式
+formatter = logging.Formatter("%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s")
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+# 第五步，将logger添加到handler里面
+logger.addHandler(fh)
+logger.addHandler(ch)
 
 '''
                             # 获取当前窗口句柄
@@ -61,7 +79,7 @@ def add_account(accountId, password, platform, cookies):
     data = {'accountId': accountId, 'password': password, "platform": platform, 'data': cookiesStr}
     s=requests.post(url, data=data)
     print s.text
-
+    logger.info(s.text)
 
 def get_account(platform):
     url = 'http://114.215.170.176:4000/get-account'
@@ -76,13 +94,16 @@ def update_cookies(accountId, password, current_cookie):
     url = 'http://114.215.170.176:4000/update-account'
     req = requests.post(url, data={'accountId': accountId, 'password': password, 'platform': '豆瓣', 'data': json.JSONEncoder().encode(current_cookie)})
     print req.text
+    logger.info(req.text)
 
 def check_task(clientId, taskTypes):
     response=requests.get('http://114.215.170.176:4000/check-task', params={'clientId': clientId, 'taskTypes': taskTypes})
     print '任务信息: '
+    logger.info('任务信息: ')
     # print response.text
     # return response.text
     print json.JSONDecoder().decode(response.text)
+    logger.info(json.JSONDecoder().decode(response.text))
     return json.JSONDecoder().decode(response.text)
     #{"result":"ok","data":null}
     #{u'count': 10, u'status': 0, u'updateTime': u'2017-09-19T02:30:00.627Z', u'title': u'\u7329\u7329', u'failTasks': 0, u'userId': u'5992d65f753bb474afad6294', u'reportTasks': 0, u'param': {u'timeInterval': u'10'}, u'createTime': u'2017-09-19T02:30:00.627Z', u'__v': 0, u'checkTasks': 5, u'_id': u'59c08128a1f0cd1feb506ee5', u'type': 712, u'taskUrl': u'https://movie.douban.com/subject/25808075/?from=showing'}
@@ -90,6 +111,7 @@ def check_task(clientId, taskTypes):
 def report_task(clientId, taskId, status):
     response=requests.post('http://114.215.170.176:4000/report-task', data={'clientId': clientId, 'taskId': taskId, 'status': status})
     print response.text
+    logger.info(response.text)
 
 def check_comment_task(clientId, taskTypes):
     pass
@@ -100,7 +122,9 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
         try:
             # 格式化成2016-03-20 11:45:39形式
             print('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+            logger.info('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             print xyz
+            logger.info(xyz)
             '''
             iplist = ['123.56.154.24:5818', '59.110.159.237:5818', '47.93.113.175:5818',
                   '123.56.44.11:5818', '101.200.76.126:5818', '123.56.228.93:5818',
@@ -130,35 +154,48 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
             '''
             info = get_account('豆瓣')
             print '账号信息: '
+            logger.info('账号信息: ')
             print info
+            logger.info(info)
             accountId = info['data']['accountId']
             password = info['data']['password']
             clientId = info['data']['ipAddress']
             print accountId
+            logger.info(accountId)
             print password
+            logger.info(password)
             print clientId
+            logger.info(clientId)
 
             checkTask = check_task(clientId, '712')#这里的clientId随便写，但是要有
 
             taskId = None
             print taskId
+            logger.info(taskId)
             content = None
             print content
+            logger.info(content)
             timeInterval = None
             print timeInterval
+            logger.info(timeInterval)
 
             if checkTask['data'] is None:
                 taskurl = None
                 print '当前没有可执行任务'
+                logger.info('当前没有可执行任务')
             else:
                 taskurl = checkTask['data']['taskUrl']
                 taskId = checkTask['data']['_id']
                 timeInterval = checkTask['data']['param']['timeInterval']
                 content = checkTask['data']['content']
                 print u'本次任务为: ' + taskurl
+                logger.info(u'本次任务为: ' + taskurl)
                 print u'任务ID为: ' +taskId
+                logger.info(u'任务ID为: ' +taskId)
                 print u'时间间隔为: ' + timeInterval
+                logger.info(u'时间间隔为: ' + timeInterval)
                 print u'任务语料为: ' +content
+                logger.info(u'任务语料为: ' +content)
             if None == taskurl:
                 driver = webdriver.Firefox()
                 currentpage = str(15*(int(pageNum)-1))
@@ -168,17 +205,22 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
                 pageMax=int(driver.find_element_by_xpath("//div[contains(@class, 'paginator')]/a[last()-1]").text)
                 print str(keyword)+' 为关键词的搜索结果最大页数为 %d' %pageMax
+                logger.info(str(keyword)+' 为关键词的搜索结果最大页数为 %d' %pageMax)
+
                 time.sleep(2)
 
                 if int(pageNum) == int(1) and int(pageNum) <= pageMax:
 
                     x = random.choice(range(1, pageMax+1))
                     print '进入随机页 %d' %x
+                    logger.info('进入随机页 %d' %x)
+
                     randompage = str(15*(int(x)-1))
                     taskurl = 'https://movie.douban.com/subject_search?search_text='+str(keyword)+'&cat=1002&start='+randompage
                     driver.get(taskurl)
                     time.sleep(2)
                     print taskurl
+                    logger.info(taskurl)
                     time.sleep(2)
 
 
@@ -187,11 +229,14 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
                     currentClassName = driver.find_element_by_xpath('//*[@id="root"]/div/div[2]/div[1]/div[1]/div[1]').get_attribute('class')
                     print currentClassName
+                    logger.info(currentClassName)
                     #每个页面内链接个数
                     linknum=len(driver.find_elements_by_xpath("//div[contains(@class, '"+ currentClassName+"')]"))
                     print '当前页面链接数为 %d'%linknum
+                    logger.info('当前页面链接数为 %d'%linknum)
                     num = random.choice(range(1, linknum+1))
                     print '随机选择第 %d 个'%num
+                    logger.info('随机选择第 %d 个'%num)
                     time.sleep(2)
 
                     j = 0
@@ -218,6 +263,8 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
 
                                     print(u'点击当前链接: '+ link.get_attribute("href"))
+                                    logger.info(u'点击当前链接: '+ link.get_attribute("href"))
+
                                     time.sleep(2)
                                     link.click()
                                     time.sleep(3)
@@ -230,11 +277,15 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
                 elif int(pageNum) != int(1) and int(pageNum) <= pageMax:
                     print '进入指定的第 %s 页'%pageNum
+                    logger.info('进入指定的第 %s 页'%pageNum)
+
                     pageNum = str(15*(int(pageNum)-1))
                     taskurl = 'https://movie.douban.com/subject_search?search_text='+str(keyword)+'&cat=1002&start='+pageNum
                     driver.get(taskurl)
                     time.sleep(2)
                     print taskurl
+                    logger.info(taskurl)
+
                     time.sleep(2)
 
 
@@ -243,11 +294,17 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
                     currentClassName = driver.find_element_by_xpath('//*[@id="root"]/div/div[2]/div[1]/div[1]/div[1]').get_attribute('class')
                     print currentClassName
+                    logger.info(currentClassName)
+
                     #每个页面内链接个数
                     linknum=len(driver.find_elements_by_xpath("//div[contains(@class, '"+ currentClassName+"')]"))
                     print '当前页面链接数为 %d'%linknum
+                    logger.info('当前页面链接数为 %d'%linknum)
+
                     num = random.choice(range(1, linknum+1))
                     print '随机选择第 %d 个'%num
+                    logger.info('随机选择第 %d 个'%num)
+
                     time.sleep(2)
 
                     j = 0
@@ -274,6 +331,8 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
 
                                     print(u'点击当前链接: '+ link.get_attribute("href"))
+                                    logger.info(u'点击当前链接: '+ link.get_attribute("href"))
+
                                     time.sleep(2)
                                     link.click()
                                     time.sleep(3)
@@ -288,6 +347,7 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
                 else:
                     print '输入页码有误，退出'
+                    logger.info('输入页码有误，退出')
 
             else:
                 driver = webdriver.Firefox()
@@ -310,23 +370,30 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
             get_cookies = json.loads(json_string)
             #print type(cookies) #<type 'dict'>
             print '取到的cookie为: '
+            logger.info('取到的cookie为: ')
             print get_cookies
+            logger.info(get_cookies)
+
             #cookies = {'bid': '0HZ8w7vIzDU', 'dbcl2': '"121892422:7k+dHEvklKs"'}
 
             response=requests.get(taskurl, cookies=get_cookies)
             time.sleep(1)
             if response.text.find('<li class="nav-user-account">') >= 0:
                 print '取到的cookie可用'
+                logger.info('取到的cookie可用')
+
                 #driver.add_cookie({'name': 'bid', 'value': cookies['bid']})
                 driver.add_cookie({'name': 'dbcl2', 'value': get_cookies['dbcl2']})
                 time.sleep(1)
                 driver.refresh()
                 time.sleep(2)
                 print u'该cookie的用户名为: ' + driver.find_element_by_xpath('//*[@id="db-global-nav"]/div/div[1]/ul/li[2]/a/span[1]').text
-
+                logger.info(u'该cookie的用户名为: ' + driver.find_element_by_xpath('//*[@id="db-global-nav"]/div/div[1]/ul/li[2]/a/span[1]').text)
 
             else:
                 print '取到的cookie不可用，进行实际登陆操作'
+                logger.info('取到的cookie不可用，进行实际登陆操作')
+
                 #点击登录
                 driver.find_element_by_xpath('//*[@id="db-global-nav"]/div/div[1]/a[1]').click()
                 time.sleep(2)
@@ -353,6 +420,7 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
                     # 如果存在验证码图片
                     print('有验证码')
+                    logger.info('有验证码')
 
                     picName = os.path.abspath('.') + '\\' + re.sub(r'[^0-9]', '', str(datetime.datetime.now())) + '.png'
                     driver.save_screenshot(picName)
@@ -382,6 +450,8 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
                     # print ('1')
                     # print ('json_res data is:', json_res)
                     print (json_res)
+                    logger.info(json_res)
+
                     json_res
                     # str="{\"showapi_res_code\":0,\"showapi_res_error\":\"\",\"showapi_res_body\":{\"Result\":\"28ht\",\"ret_code\":0,\"Id\":\"adb1c363-d566-48a6-820e-55859428599d\"}}"
 
@@ -391,6 +461,8 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
                     yanzhengma = result['showapi_res_body']['Result']
 
                     print yanzhengma
+                    logger.info(yanzhengma)
+
                     time.sleep(2)
 
 
@@ -413,10 +485,14 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
                 else:
                     #if isElementExist("//*[contains(@id, 'lzform')]", driver):
                     print('无验证码')
+                    logger.info('无验证码')
+
                     driver.find_element_by_xpath('//*[@id="lzform"]/div[6]/input').click()
                     time.sleep(10)
 
                 print driver.get_cookies()
+                logger.info(driver.get_cookies())
+
                 # for cookie in driver.get_cookies():
                 #     print "%s == %s" % (cookie['name'], cookie['value'])
                 for i in range(0, len(driver.get_cookies())):
@@ -427,12 +503,18 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
                     #print y
                 current_cookie = {'dbcl2': y}
                 print '本次成功登陆的cookie为: '
+                logger.info('本次成功登陆的cookie为: ')
+
                 print current_cookie
+                logger.info(current_cookie)
 
                 print '需要更新cookie'
-                update_cookies(accountId, password, current_cookie)
-                print '更新cookie成功'
+                logger.info('需要更新cookie')
 
+                update_cookies(accountId, password, current_cookie)
+
+                print '更新cookie成功'
+                logger.info('更新cookie成功')
 
 
 
@@ -474,15 +556,20 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
                     random_comment = random.choice(range(1, commentNum+1))
 
                     print '当前页面短评数为 %d 随机选择第 %d 个'%(commentNum, random_comment)
+                    logger.info('当前页面短评数为 %d 随机选择第 %d 个'%(commentNum, random_comment))
+
                     copytext = driver.find_element_by_xpath('//*[@id="hot-comments"]/div['+str(random_comment)+']/div/p').text
 
                     text = copytext
                     time.sleep(2)
 
                     print text
+                    logger.info(text)
+
                     time.sleep(2)
                 else:
                     print u'当前页面没有评论，采用默认评论：'+text
+                    logger.info(u'当前页面没有评论，采用默认评论：'+text)
 
 
                 driver.find_element_by_xpath('//*[@id="comment"]').click()
@@ -503,33 +590,42 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
             if None != taskId:
                 print '上报任务成功结果:'
+                logger.info('上报任务成功结果:')
                 report_task(clientId, taskId, '1')
                 time.sleep(2)
 
             print('本次评论成功，结束时间为： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+            logger.info('本次评论成功，结束时间为： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+
             driver.quit()
 
 
             if None == timeInterval:
                 timeInterval = random.choice(range(21600, 21700))
                 print '技能CD： '+ str(timeInterval) + '小时'
+                logger.info('技能CD： '+ str(timeInterval) + '小时')
                 time.sleep(timeInterval)
             else:
                 print '技能CD： '+ str(timeInterval) + '秒'
+                logger.info('技能CD： '+ str(timeInterval) + '秒')
                 time.sleep(int(timeInterval))
 
 
 
         except Exception as e:
             print e
+            logger.error(e)
             driver.quit()
             if None != taskId:
                 print '上报任务失败结果:'
+                logger.error('上报任务失败结果:')
+
                 report_task(clientId, taskId, '0')
 
 
         finally:
             print('---------我是分割线------------')
+            logger.info('---------我是分割线------------')
 
 
 
