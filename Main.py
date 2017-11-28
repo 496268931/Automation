@@ -21,3 +21,6 @@ import ZZZautoSign_gewala
 
 #格瓦拉注册
 #ZZZautoSign_gewala.main()
+
+import appium_test
+appium_test.main()

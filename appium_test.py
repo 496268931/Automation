@@ -1,4 +1,8 @@
 #coding=utf-8
+import uuid
+
+import requests
+
 import  utf8Togbk
 
 import base64
@@ -15,12 +19,16 @@ from appium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from com.aliyun.api.gateway.sdk.util import showapi
 
-PATH=lambda p:os.path.abspath(os.path.join(os.path.dirname(__file__),p))
+# PATH=lambda p:os.path.abspath(os.path.join(os.path.dirname(__file__),p))
 #desired_caps['app'] = PATH('E:\\虎啸\\appiumTest\\CalculatorSuper.apk')
 
 
 
 # execute command, and return the output
+def get_mac_address():
+    node = uuid.getnode()
+    mac = uuid.UUID(int=node).hex[-12:]
+    return mac
 def execCmd(cmd):
     r = os.popen(cmd)
     text = r.read()
@@ -85,77 +93,70 @@ def findAndKill():
 
     print os.popen('tasklist /fi "imagename eq 360MobileMgr.exe"').read().decode('gbk')
     print os.popen('taskkill /F /IM 360MobileMgr.exe').read().decode('gbk')
-    print os.popen('tasklist /fi "imagename eq node.exe"').read().decode('gbk')
-    print os.popen('taskkill /F /IM node.exe').read().decode('gbk')
+    # print os.popen('tasklist /fi "imagename eq node.exe"').read().decode('gbk')
+    # print os.popen('taskkill /F /IM node.exe').read().decode('gbk')
     print os.popen('tasklist /fi "imagename eq adb.exe"').read().decode('gbk')
     print os.popen('taskkill /F /IM adb.exe').read().decode('gbk')
 
 
-
-findAndKill()
-
-cmd = 'adb devices'
-adb_result = execCmd(cmd).split('\n')
-print adb_result
-# for i in adb_result:
-#
-#     if not i.endswith('\tdevice'):
-#         adb_result.remove(i)
-#     else:
-#         if i.endswith(r'*'):
-#             adb_result.remove(i)
-# print adb_result
-adb_result.pop(0)
-adb_result.pop(0)
-adb_result.pop(0)
-adb_result.pop()
-adb_result.pop()
-
-print adb_result
-# time.sleep(11111)
-
-deviceInfoList = []
-
-# deviceInfoList = [{'desired_cap': {'deviceName': '03d61be113b3d502', 'unicodeKeyboard': 'True', 'udid': '03d61be113b3d502', 'resetKeyboard': 'True', 'platformVersion': '4.4.2', 'appPackage': 'com.sina.weibo', 'platformName': 'Android', 'appActivity': 'com.sina.weibo.SplashActivity'}, 'deviceID': '03d61be113b3d502', 'port': '4973'}, {'desired_cap': {'deviceName': '461dcf4', 'unicodeKeyboard': 'True', 'udid': '461dcf4', 'resetKeyboard': 'True', 'platformVersion': '4.4.2', 'appPackage': 'com.sina.weibo', 'platformName': 'Android', 'appActivity': 'com.sina.weibo.SplashActivity'}, 'deviceID': '461dcf4', 'port': '4854'}]
+def install_deviceInfoList():
+    findAndKill()
 
 
-for i in range(len(adb_result)):
-    deviceInfoList.append({'deviceID':adb_result[i].split('\t')[0]})
-print deviceInfoList
+    adb_result = execCmd('adb devices').split('\n')
+    print adb_result
+    # for i in adb_result:
+    #
+    #     if not i.endswith('\tdevice'):
+    #         adb_result.remove(i)
+    #     else:
+    #         if i.endswith(r'*'):
+    #             adb_result.remove(i)
+    # print adb_result
+    adb_result.pop(0)
+    adb_result.pop(0)
+    adb_result.pop(0)
+    adb_result.pop()
+    adb_result.pop()
+
+    print adb_result
+    # time.sleep(11111)
+
+    deviceInfoList = []
+
+    # deviceInfoList = [{'desired_cap': {'deviceName': '03d61be113b3d502', 'unicodeKeyboard': 'True', 'udid': '03d61be113b3d502', 'resetKeyboard': 'True', 'platformVersion': '4.4.2', 'appPackage': 'com.sina.weibo', 'platformName': 'Android', 'appActivity': 'com.sina.weibo.SplashActivity'}, 'deviceID': '03d61be113b3d502', 'port': '4973'}, {'desired_cap': {'deviceName': '461dcf4', 'unicodeKeyboard': 'True', 'udid': '461dcf4', 'resetKeyboard': 'True', 'platformVersion': '4.4.2', 'appPackage': 'com.sina.weibo', 'platformName': 'Android', 'appActivity': 'com.sina.weibo.SplashActivity'}, 'deviceID': '461dcf4', 'port': '4854'}]
 
 
-for i in range(len(deviceInfoList)):
-    deviceInfoList[i]['port'] = str(getFreePort())
-print deviceInfoList
+    for i in range(len(adb_result)):
+        deviceInfoList.append({'deviceID':adb_result[i].split('\t')[0]})
+    print deviceInfoList
 
 
-for i in range(len(deviceInfoList)):
+    for i in range(len(deviceInfoList)):
+        deviceInfoList[i]['port'] = str(getFreePort())
+    print deviceInfoList
 
-    desired_caps = {}
-    desired_caps['platformName'] = 'Android'
-    desired_caps['platformVersion'] = '4.4.2'
-    desired_caps['deviceName'] = deviceInfoList[i]['deviceID']
-    desired_caps['udid'] = deviceInfoList[i]['deviceID']
-    desired_caps['appPackage'] = 'com.sina.weibo'
-    desired_caps['appActivity'] = 'com.sina.weibo.SplashActivity'
-    desired_caps['unicodeKeyboard'] = 'True'
-    desired_caps['resetKeyboard'] = 'True'
-    deviceInfoList[i]['desired_cap'] = desired_caps
+
+    for i in range(len(deviceInfoList)):
+
+        desired_caps = {}
+        desired_caps['platformName'] = 'Android'
+        desired_caps['platformVersion'] = '4.4.2'
+        desired_caps['deviceName'] = deviceInfoList[i]['deviceID']
+        desired_caps['udid'] = deviceInfoList[i]['deviceID']
+        desired_caps['appPackage'] = 'com.sina.weibo'
+        desired_caps['appActivity'] = 'com.sina.weibo.SplashActivity'
+        desired_caps['unicodeKeyboard'] = 'True'
+        desired_caps['resetKeyboard'] = 'True'
+        deviceInfoList[i]['desired_cap'] = desired_caps
     # print desired_caps
     # print deviceInfoList[i]
-print deviceInfoList
+    print deviceInfoList
+    return deviceInfoList
 
 
 
-
-
-
-
-def sendWeibo(driver):
-    # driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
-
-
-
+def login(driver, username, password):
     #登录按钮
     #WebDriverWait(driver, 20).until(lambda x: x.find_element_by_id('com.sina.weibo:id/titleSave')).click()
     WebDriverWait(driver, 60).until(lambda x: x.find_element_by_accessibility_id('我的资料')).click()
@@ -167,11 +168,11 @@ def sendWeibo(driver):
         time.sleep(2)
         driver.find_element_by_id('com.sina.weibo:id/etLoginUsername').clear()
         time.sleep(2)
-        driver.find_element_by_id('com.sina.weibo:id/etLoginUsername').send_keys('17018036531')
+        driver.find_element_by_id('com.sina.weibo:id/etLoginUsername').send_keys(username)
         time.sleep(2)
         driver.find_element_by_id('com.sina.weibo:id/etPwd').clear()
         time.sleep(2)
-        driver.find_element_by_id('com.sina.weibo:id/etPwd').send_keys('asd55333')
+        driver.find_element_by_id('com.sina.weibo:id/etPwd').send_keys(password)
         time.sleep(2)
         driver.find_element_by_id('com.sina.weibo:id/bnLogin').click()
         time.sleep(10)
@@ -203,7 +204,7 @@ def sendWeibo(driver):
                     b_64 = base64.b64encode(f.read())
                     f.close()
                     req = showapi.ShowapiRequest("http://ali-checkcode.showapi.com/checkcode",
-                                         "4e5510e696c748ca8d5033dd595bfbbc")
+                                                 "4e5510e696c748ca8d5033dd595bfbbc")
                     json_res = req.addTextPara("typeId", "3040") \
                         .addTextPara("img_base64", b_64) \
                         .addTextPara("convert_to_jpg", "1") \
@@ -256,11 +257,11 @@ def sendWeibo(driver):
 
         driver.find_element_by_id('com.sina.weibo:id/etLoginUsername').clear()
         time.sleep(2)
-        driver.find_element_by_id('com.sina.weibo:id/etLoginUsername').send_keys('17018036531')
+        driver.find_element_by_id('com.sina.weibo:id/etLoginUsername').send_keys(username)
         time.sleep(2)
         driver.find_element_by_id('com.sina.weibo:id/etPwd').clear()
         time.sleep(2)
-        driver.find_element_by_id('com.sina.weibo:id/etPwd').send_keys('asd55333')
+        driver.find_element_by_id('com.sina.weibo:id/etPwd').send_keys(password)
         time.sleep(2)
         driver.find_element_by_id('com.sina.weibo:id/bnLogin').click()
         time.sleep(10)
@@ -333,60 +334,69 @@ def sendWeibo(driver):
                         break
 
 
-    print 123333333333333333333
+    print '登录成功'
+    time.sleep(15)
+
+
+def sendWeibo(current_deviceInfo, text):
+    # driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+    driver = webdriver.Remote('http://localhost:' + current_deviceInfo['port'] + '/wd/hub', current_deviceInfo['desired_cap'])
     time.sleep(10)
+
+    # login(driver, '17018036531', 'asd55333')
+
     #WebDriverWait(driver, 30).until(lambda x: x.find_element_by_accessibility_id('打开发布面板')).click()
     driver.find_element_by_id('com.sina.weibo:id/plus_icon').click()
     time.sleep(2)
+
     #点击文字 发微博
     driver.find_element_by_id('com.sina.weibo:id/composer_item_text').click()
     time.sleep(3)
-    print 123
     driver.find_element_by_id('com.sina.weibo:id/sv_element_container').clear()
     time.sleep(2)
-    driver.find_element_by_id('com.sina.weibo:id/sv_element_container').send_keys(u'今天天气不错呢')
+    driver.find_element_by_id('com.sina.weibo:id/sv_element_container').send_keys(text)
     time.sleep(2)
-    print 123
+
     driver.find_element_by_id('com.sina.weibo:id/titleSave').click()
     time.sleep(2)
-    print 123456789
 
-    driver.quit()
 
-def forwardWeibo(current_deviceInfo):
+
+
+def forwardWeibo(current_deviceInfo, mblogid, text):
     driver = webdriver.Remote('http://localhost:' + current_deviceInfo['port'] + '/wd/hub', current_deviceInfo['desired_cap'])
     time.sleep(10)
 
-    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=4173987502094550')
+    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=' + mblogid)
     time.sleep(3)
     driver.find_element_by_id('com.sina.weibo:id/forward').click()
     time.sleep(2)
-    driver.find_element_by_id('com.sina.weibo:id/edit_view').send_keys(u'今天天气不错呢')
+    driver.find_element_by_id('com.sina.weibo:id/edit_view').send_keys(text)
     time.sleep(2)
     driver.find_element_by_id('com.sina.weibo:id/titleSave').click()
     time.sleep(2)
 
 
-def commentWeibo(current_deviceInfo):
+def commentWeibo(current_deviceInfo, mblogid, text):
 
     driver = webdriver.Remote('http://localhost:' + current_deviceInfo['port'] + '/wd/hub', current_deviceInfo['desired_cap'])
     time.sleep(10)
 
-    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=4173987502094550')
+    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=' + mblogid)
     time.sleep(3)
     driver.find_element_by_id('com.sina.weibo:id/comment').click()
     time.sleep(2)
-    driver.find_element_by_id('com.sina.weibo:id/edit_view').send_keys(u'今天天气不错呢')
+    driver.find_element_by_id('com.sina.weibo:id/edit_view').send_keys(text)
     time.sleep(2)
     driver.find_element_by_id('com.sina.weibo:id/titleSave').click()
     time.sleep(2)
 
 
-def praiseWeibo(current_deviceInfo):
+def praiseWeibo(current_deviceInfo, mblogid):
     driver = webdriver.Remote('http://localhost:' + current_deviceInfo['port'] + '/wd/hub', current_deviceInfo['desired_cap'])
     time.sleep(10)
 
-    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=4173987502094550')
+    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=' + mblogid)
     time.sleep(3)
     driver.find_element_by_id('com.sina.weibo:id/liked').click()
     time.sleep(2)
@@ -399,6 +409,22 @@ def praiseWeibo(current_deviceInfo):
 
 
 
+
+def check_task(clientId, taskTypes):
+    response=requests.get('http://localhost:4000/check-task', params={'clientId': clientId,
+                                                                  'taskTypes': taskTypes})
+    print '任务信息: '
+
+    # print response.text
+    # return response.text
+    print json.JSONDecoder().decode(response.text)
+    return json.JSONDecoder().decode(response.text)
+
+def report_task(clientId, taskId, status):
+    response=requests.post('http://localhost:4000/report-task', data={'clientId': clientId, 'taskId': taskId, 'status': status})
+    # print '上报结果: '
+    # print response.text
+    return response.text
 
 def main():
     # driver1 = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps1)
@@ -422,66 +448,134 @@ def main():
     # t_appium2 = threading.Thread(target=execCmd,args=(start2,))
     # t_appiums.append(t_appium2)
 
+    # url = 'http://192.168.10.174:4000/add-account'
+    # data = {'accountId': '17018036531', 'password': 'asd55333', 'platform': 'appium_微博',
+    #         'data': {"access_token": "2.00rbAAAHzfFy9C0049e8db2e135HhC", "remind_in": "2651530",
+    #                  "expires_in": 8888888, "uid": "6412932171", "isRealName": "true"}}
+    # s = requests.post(url, data=data)
+    # print s.text
+
+    # info = get_account('豆瓣')
+    # print '账号信息: '
+    # print info
+
+
+    # time.sleep(11111)
+    try:
+        task_type = checkTask['data']['type']
+        weibo_rid = checkTask['data']['taskUrl']
+        taskId = checkTask['data']['_id']
+        timeInterval = checkTask['data']['param']['timeInterval']
+        # content = checkTask['data']['content'] 循环取
+        count = checkTask['data']['title']['count']
+        print u'任务类型为: ' + str(task_type)
+        print u'本次任务为: ' + weibo_rid
+        print u'任务ID为: ' +taskId
+        print u'时间间隔为: ' + timeInterval
+        # print u'任务语料为: ' + content
+        print u'任务数量为: ' + str(count)
 
 
 
-    t_startAppiums = []
-    for j in range(len(deviceInfoList)):
-        start = 'start /b D:\\ProgramFiles\\appium\\Appium\\node.exe ' \
-                 'D:\\ProgramFiles\\appium\\Appium\\node_modules\\appium\\lib\\server\\main.js ' \
-                 '--address 127.0.0.1 --port ' + deviceInfoList[j]['port'] + '  --bootstrap-port ' \
-                                                                             ''+ \
-                str(int(deviceInfoList[j]['port'])+1)
-        t_startAppiums.append(threading.Thread(target=execCmd,args=(start,)))
-
-
-    for t in t_startAppiums:
-        t.setDaemon(True)
-        t.start()
-    # x.join()
-    #启动需要时间，必须等待一段时间
-    time.sleep(8*len(t_startAppiums))
-    print 'appium服务已启动'
 
 
 
 
+        deviceInfoList = install_deviceInfoList()
 
-    task_threads = []
-    for j in range(len(deviceInfoList)):
-
-        # driver = webdriver.Remote('http://localhost:' + deviceInfo[j]['port'] + '/wd/hub', deviceInfo[j]['desired_cap'])
-
-
-        current_deviceInfo = deviceInfoList[j]
-        print current_deviceInfo
-        thread = threading.Thread(target=praiseWeibo,args=(current_deviceInfo,))
-        task_threads.append(thread)
-
-        print '第 %d 个设备的线程组装完毕' %j
-    print '所有线程组装完毕，开始作业'
-
-    # driver2 = webdriver.Remote('http://localhost:4724/wd/hub', desired_caps2)
-    # time.sleep(10)
-
-    # thread2 = threading.Thread(target=praiseWeibo,args=(driver2,desired_caps2['udid']))
-    # threads.append(thread2)
+        t_startAppiums = []
+        for j in range(len(deviceInfoList)):
+            start = 'start /b D:\\ProgramFiles\\appium\\Appium\\node.exe D:\\ProgramFiles\\appium\\Appium\\node_modules\\appium\\lib\\server\\main.js --address 127.0.0.1 --port ' + deviceInfoList[j]['port'] + '  --bootstrap-port ' + str(int(deviceInfoList[j]['port']) + 1)
+            t_startAppiums.append(threading.Thread(target=execCmd,args=(start,)))
 
 
+        for t in t_startAppiums:
+            t.setDaemon(True)
+            t.start()
+        # x.join()
+        #启动需要时间，必须等待一段时间
+        time.sleep(10*len(t_startAppiums))
+        print 'appium服务已启动'
 
-    for current_thread in task_threads:
+        task_threads = []
+        for j in range(len(deviceInfoList)):
 
-        current_thread.start()
-        print '当前线程启动'
+            # driver = webdriver.Remote('http://localhost:' + deviceInfo[j]['port'] + '/wd/hub', deviceInfo[j]['desired_cap'])
 
-    current_thread.join()
+            current_deviceInfo = deviceInfoList[j]
+            print current_deviceInfo
+
+            # thread = threading.Thread(target=praiseWeibo,args=(current_deviceInfo,'4173987502094550'))
+            # thread = threading.Thread(target=commentWeibo,args=(current_deviceInfo, taskurl, check_task(get_mac_address(), task_type)['data']['content']))
+            # thread = threading.Thread(target=sendWeibo,args=(current_deviceInfo, u'今天天气不错'))
+
+            if task_type ==3000:
+                print '发送微博'
+                thread = threading.Thread(target=sendWeibo,args=(current_deviceInfo, check_task(get_mac_address(), task_type)['data']['content']))
+            elif task_type == 3001:
+                print '转发微博'
+                thread = threading.Thread(target=forwardWeibo,args=(current_deviceInfo, weibo_rid, check_task(get_mac_address(), task_type)['data']['content']))
+            elif task_type == 3002:
+                print '评论微博'
+                thread = threading.Thread(target=commentWeibo,args=(current_deviceInfo, weibo_rid, check_task(get_mac_address(), task_type)['data']['content']))
+            elif task_type == 3003:
+                print '点赞微博'
+                thread = threading.Thread(target=praiseWeibo,args=(current_deviceInfo,weibo_rid))
+
+            task_threads.append(thread)
+
+            print '第 %d 个设备的线程组装完毕' %(j+1)
+        print '所有线程组装完毕，开始作业'
+
+        # driver2 = webdriver.Remote('http://localhost:4724/wd/hub', desired_caps2)
+        # time.sleep(10)
+
+        # thread2 = threading.Thread(target=praiseWeibo,args=(driver2,desired_caps2['udid']))
+        # threads.append(thread2)
 
 
 
-    print "all over %s" % time.ctime()
+        for current_thread in task_threads:
+
+            current_thread.start()
+            print '当前线程启动'
+
+        current_thread.join()
+
+
+        c_count = 1
+        while c_count < count:
+            report_task(get_mac_address(), taskId, '1')
+            c_count = c_count + 1
+
+        print report_task(get_mac_address(), taskId, '1')
+    except Exception as e:
+        print e
+
 
 if __name__ == '__main__':
-    main()
+    # 4173987502094550
+    clientId = get_mac_address()
+    print clientId
+
+
+    checkTask = check_task(clientId, '3000')
+
+    if checkTask['data'] is None:
+        weibo_rid = None
+        print '当前没有可执行任务'
+
+    else:
+
+    # url ='http://localhost:4000/add-account'
+    # data = {'accountId': '17018031242', 'password': 'asd55333', "platform": '微博评论',
+    #         'data': {"access_token": "2.00OjhGzGzfFy9C54e9588685M6183E", "remind_in": "2633070", "expires_in": 2633070, "uid": "6399751552", "isRealName": "true"}}
+    # s=requests.post(url, data=data)
+    # print s.text
+
+    # time.sleep(11111)
+        main()
+    print "all over %s" % time.ctime()
 
 
 
