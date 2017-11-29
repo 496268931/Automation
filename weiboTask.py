@@ -346,7 +346,8 @@ def getSocketIP():
     #请求连接服务端
     sk.connect(ip_port)
     #发送数据
-    sk.sendall(bytes('wiseweb\r\n'))
+    sk.sendall(json.dumps({"id":"wiseweb","time":60,"type":"client"}))
+    sk.sendall(bytes('\r\n'))
     proxyIP=sk.makefile().readline()
     #打印接受的数据
     print(proxyIP)
