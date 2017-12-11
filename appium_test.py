@@ -411,7 +411,7 @@ def praiseWeibo(current_deviceInfo, mblogid):
 
 
 def check_task(clientId, taskTypes):
-    response=requests.get('http://localhost:4000/check-task', params={'clientId': clientId,
+    response=requests.get('http://114.215.170.176:4000/check-task', params={'clientId': clientId,
                                                                   'taskTypes': taskTypes})
     print '任务信息: '
 
@@ -421,7 +421,7 @@ def check_task(clientId, taskTypes):
     return json.JSONDecoder().decode(response.text)
 
 def report_task(clientId, taskId, status):
-    response=requests.post('http://localhost:4000/report-task', data={'clientId': clientId, 'taskId': taskId, 'status': status})
+    response=requests.post('http://114.215.170.176:4000/report-task', data={'clientId': clientId, 'taskId': taskId, 'status': status})
     # print '上报结果: '
     # print response.text
     return response.text
@@ -559,7 +559,7 @@ if __name__ == '__main__':
     print clientId
 
 
-    checkTask = check_task(clientId, '3000')
+    checkTask = check_task(clientId, '3003')
 
     if checkTask['data'] is None:
         weibo_rid = None
