@@ -346,8 +346,16 @@ def sendWeibo(current_deviceInfo, text):
     # login(driver, '17018036531', 'asd55333')
 
     #WebDriverWait(driver, 30).until(lambda x: x.find_element_by_accessibility_id('打开发布面板')).click()
-    driver.find_element_by_id('com.sina.weibo:id/plus_icon').click()
-    time.sleep(2)
+
+    while True:
+        if isElementExist('com.sina.weibo:id/plus_icon', driver):
+
+            driver.find_element_by_id('com.sina.weibo:id/plus_icon').click()
+            time.sleep(2)
+            break
+        time.sleep(1)
+
+
 
     #点击文字 发微博
     driver.find_element_by_id('com.sina.weibo:id/composer_item_text').click()
@@ -369,8 +377,16 @@ def forwardWeibo(current_deviceInfo, mblogid, text):
 
     os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=' + mblogid)
     time.sleep(3)
-    driver.find_element_by_id('com.sina.weibo:id/forward').click()
-    time.sleep(2)
+
+    while True:
+        if isElementExist('com.sina.weibo:id/forward', driver):
+
+            driver.find_element_by_id('com.sina.weibo:id/forward').click()
+            time.sleep(2)
+            break
+        time.sleep(1)
+
+
     driver.find_element_by_id('com.sina.weibo:id/edit_view').send_keys(text)
     time.sleep(2)
     driver.find_element_by_id('com.sina.weibo:id/titleSave').click()
@@ -384,8 +400,17 @@ def commentWeibo(current_deviceInfo, mblogid, text):
 
     os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=' + mblogid)
     time.sleep(3)
-    driver.find_element_by_id('com.sina.weibo:id/comment').click()
-    time.sleep(2)
+
+    while True:
+        if isElementExist('com.sina.weibo:id/comment', driver):
+
+            driver.find_element_by_id('com.sina.weibo:id/comment').click()
+            time.sleep(2)
+            break
+        time.sleep(1)
+
+
+
     driver.find_element_by_id('com.sina.weibo:id/edit_view').send_keys(text)
     time.sleep(2)
     driver.find_element_by_id('com.sina.weibo:id/titleSave').click()
@@ -398,9 +423,14 @@ def praiseWeibo(current_deviceInfo, mblogid):
 
     os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am start -n com.sina.weibo/.feed.DetailWeiboActivity -d sinaweibo://detail?mblogid=' + mblogid)
     time.sleep(3)
-    driver.find_element_by_id('com.sina.weibo:id/liked').click()
-    time.sleep(2)
+    while True:
+        if isElementExist('com.sina.weibo:id/liked', driver):
 
+            driver.find_element_by_id('com.sina.weibo:id/liked').click()
+            time.sleep(2)
+            break
+        time.sleep(1)
+        # print 1
 
 # t1 = threading.Thread(target=sendWeibo,args=(webdriver.Remote('http://localhost:4723/wd/hub', desired_caps1),))
 # threads.append(t1)
@@ -543,12 +573,12 @@ def main():
         current_thread.join()
 
 
-        c_count = 1
-        while c_count < count:
-            report_task(get_mac_address(), taskId, '1')
-            c_count = c_count + 1
-
-        print report_task(get_mac_address(), taskId, '1')
+        # c_count = 1
+        # while c_count < count:
+        #     report_task(get_mac_address(), taskId, '1')
+        #     c_count = c_count + 1
+        #
+        # print report_task(get_mac_address(), taskId, '1')
     except Exception as e:
         print e
 

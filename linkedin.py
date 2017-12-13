@@ -26,8 +26,15 @@ def isElementExist(element, driver):
 #     # print i
 #     # print i['href']
 #     url.append('http://www.linkedin.com'+i['href'])
-# jxm@hfm-phe.com
-# 23957648jxm
+'''
+jxm@hfm-phe.com            23957648jxm
+
+https://www.linkedin.com/mynetwork/invite-connect/connections/
+mary@hfm-phe.com           zq3856523
+
+hao_monica@sina.com        monicafeng1990
+eva@hfm-phe.com            229911zzy!
+'''
 username = raw_input("please input your username: ")  # input 函数的使用
 password = raw_input("please input your password: ")  # input 函数的使用
 time.sleep(5)
