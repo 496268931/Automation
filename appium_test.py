@@ -63,9 +63,9 @@ def IsOpen(ip,port):
 def getFreePort():
 
     while True:
-        random_port = random.randrange(4723,5000)
-
-        if not IsOpen('127.0.0.1', random_port) and not IsOpen('127.0.0.1', random_port + 1) :
+        # random_port = random.randrange(4723,5000)
+        random_port = random.randrange(10000,65535)
+        if not IsOpen('127.0.0.1', random_port) and not IsOpen('127.0.0.1', random_port + 1):
 
 
             return random_port
@@ -100,8 +100,16 @@ def findAndKill():
 
 
 def install_deviceInfoList():
-    findAndKill()
 
+    while True:
+        findAndKill()
+        time.sleep(2)
+        if os.popen('tasklist /fi "imagename eq 360MobileMgr.exe"').read().decode('gbk').find(
+                u'信息: 没有运行的任务匹配指定标准。') >= 0 and os.popen(
+                'tasklist /fi "imagename eq adb.exe"').read().decode('gbk').find(
+                u'信息: 没有运行的任务匹配指定标准。') >= 0:
+            print '没有占据端口的程序'
+            break
 
     adb_result = execCmd('adb devices').split('\n')
     print adb_result
@@ -368,6 +376,9 @@ def sendWeibo(current_deviceInfo, text):
     driver.find_element_by_id('com.sina.weibo:id/titleSave').click()
     time.sleep(2)
 
+    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am force-stop com.sina.weibo')
+    time.sleep(2)
+
 
 
 
@@ -390,6 +401,9 @@ def forwardWeibo(current_deviceInfo, mblogid, text):
     driver.find_element_by_id('com.sina.weibo:id/edit_view').send_keys(text)
     time.sleep(2)
     driver.find_element_by_id('com.sina.weibo:id/titleSave').click()
+    time.sleep(2)
+
+    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am force-stop com.sina.weibo')
     time.sleep(2)
 
 
@@ -416,6 +430,8 @@ def commentWeibo(current_deviceInfo, mblogid, text):
     driver.find_element_by_id('com.sina.weibo:id/titleSave').click()
     time.sleep(2)
 
+    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am force-stop com.sina.weibo')
+    time.sleep(2)
 
 def praiseWeibo(current_deviceInfo, mblogid):
     driver = webdriver.Remote('http://localhost:' + current_deviceInfo['port'] + '/wd/hub', current_deviceInfo['desired_cap'])
@@ -431,6 +447,10 @@ def praiseWeibo(current_deviceInfo, mblogid):
             break
         time.sleep(1)
         # print 1
+
+
+    os.system('adb -s ' + current_deviceInfo['deviceID'] +' shell am force-stop com.sina.weibo')
+    time.sleep(2)
 
 # t1 = threading.Thread(target=sendWeibo,args=(webdriver.Remote('http://localhost:4723/wd/hub', desired_caps1),))
 # threads.append(t1)
@@ -596,6 +616,9 @@ if __name__ == '__main__':
         print '当前没有可执行任务'
 
     else:
+        main()
+    print "all over %s" % time.ctime()
+
 
     # url ='http://localhost:4000/add-account'
     # data = {'accountId': '17018031242', 'password': 'asd55333', "platform": '微博评论',
@@ -604,8 +627,3 @@ if __name__ == '__main__':
     # print s.text
 
     # time.sleep(11111)
-        main()
-    print "all over %s" % time.ctime()
-
-
-
