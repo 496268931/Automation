@@ -355,6 +355,17 @@ def getSocketIP():
     #关闭连接
     sk.close()
     return proxyIP
+
+def getHttpIP():
+    while True:
+        r = requests.get('http://121.42.227.3:3838/getIp?clientId=123456')
+        res = r.text
+        if res != 'null\r\n':
+            print '取到IP'
+            break
+        time.sleep(5)
+
+    return res.replace('\r\n','')
 def add_account(username, password, APP_KEY, APP_SECRET, CALLBACK_URL, platform, ifip=1):#ifip是否使用代理ip，1是，0否
     # accountId = '18513199891'
     # password = '1qaz2wsx'
@@ -394,7 +405,8 @@ def add_account(username, password, APP_KEY, APP_SECRET, CALLBACK_URL, platform,
         # #故意错误，为了测试抓取免费代理
         # print requests.get('http://httpbin.org/ip',proxies={"http":'http://59.40.51.99:8010'}).text
 
-        current_ip = getSocketIP()
+        # current_ip = getSocketIP()
+        current_ip = getHttpIP
         ip_ip = current_ip.split(":")[0]
         ip_port = current_ip.split(":")[1]
     except:

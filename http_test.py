@@ -10,6 +10,7 @@ print(type(title))
 print(type(title1))
 
 actors = ['沈腾', '马丽', '艾伦', '田雨 ', '薛皓文', '黄才伦', '常远']
+print actors
 print ''.join(actors)
 print type(''.join(actors))
 print(type(actors))
@@ -19,6 +20,7 @@ minScore = 7
 maxScore = 10
 prototypes = {'唐人街探案': '56442c2b4f3854a2007db4d5', '夏洛特烦恼': '56442bd94f3854a2007db483',
               '一念天堂': '56442c2e4f3854a2007db4d6'}
+print prototypes
 print(type(prototypes))
 print(json.dumps(prototypes, ensure_ascii=False))
 print(type(json.dumps(prototypes, ensure_ascii=False)))

@@ -561,13 +561,13 @@ def main():
 
             if task_type ==3000:
                 print '发送微博'
-                thread = threading.Thread(target=sendWeibo,args=(current_deviceInfo, check_task(get_mac_address(), task_type)['data']['content']))
+                thread = threading.Thread(target=sendWeibo,args=(current_deviceInfo, ''.join(check_task(get_mac_address(), task_type)['data']['content'])))
             elif task_type == 3001:
                 print '转发微博'
-                thread = threading.Thread(target=forwardWeibo,args=(current_deviceInfo, weibo_rid, check_task(get_mac_address(), task_type)['data']['content']))
+                thread = threading.Thread(target=forwardWeibo,args=(current_deviceInfo, weibo_rid, ''.join(check_task(get_mac_address(), task_type)['data']['content'])))
             elif task_type == 3002:
                 print '评论微博'
-                thread = threading.Thread(target=commentWeibo,args=(current_deviceInfo, weibo_rid, check_task(get_mac_address(), task_type)['data']['content']))
+                thread = threading.Thread(target=commentWeibo,args=(current_deviceInfo, weibo_rid,''.join(check_task(get_mac_address(), task_type)['data']['content'])))
             elif task_type == 3003:
                 print '点赞微博'
                 thread = threading.Thread(target=praiseWeibo,args=(current_deviceInfo,weibo_rid))
@@ -609,7 +609,7 @@ if __name__ == '__main__':
     print clientId
 
 
-    checkTask = check_task(clientId, '3003')
+    checkTask = check_task(clientId, '3002')
 
     if checkTask['data'] is None:
         weibo_rid = None
