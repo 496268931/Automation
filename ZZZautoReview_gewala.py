@@ -28,7 +28,7 @@ def isElementExist(element, driver):
 
 
 def main(taskUrl, account, password, text):
-    try:
+    # try:
         #args = Param()
 
         print('开始本次评论任务')
@@ -162,12 +162,12 @@ def main(taskUrl, account, password, text):
         print('本次评论任务成功')
 
 
-    except Exception as e:
-        print(e)
-        print('本次评论任务失败')
-    finally:
-        #print(e)
-        driver.quit()
+    # except Exception as e:
+    #     print(e)
+    #     print('本次评论任务失败')
+    # finally:
+    #     #print(e)
+    #     driver.quit()
 
 
 

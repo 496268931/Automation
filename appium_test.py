@@ -476,7 +476,7 @@ def report_task(clientId, taskId, status):
     # print response.text
     return response.text
 
-def main():
+def main(checkTask):
     # driver1 = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps1)
     # sendWeibo(driver1)
 
@@ -512,12 +512,12 @@ def main():
 
     # time.sleep(11111)
     try:
-        task_type = checkTask['data']['type']
-        weibo_rid = checkTask['data']['taskUrl']
-        taskId = checkTask['data']['_id']
-        timeInterval = checkTask['data']['param']['timeInterval']
-        # content = checkTask['data']['content'] 循环取
-        count = checkTask['data']['title']['count']
+        task_type = checkTask['type']
+        weibo_rid = checkTask['taskUrl']
+        taskId = checkTask['_id']
+        timeInterval = checkTask['param']['timeInterval']
+        # content = checkTask['content'] 循环取
+        count = checkTask['count']
         print u'任务类型为: ' + str(task_type)
         print u'本次任务为: ' + weibo_rid
         print u'任务ID为: ' +taskId
@@ -593,12 +593,12 @@ def main():
         current_thread.join()
 
 
-        # c_count = 1
-        # while c_count < count:
-        #     report_task(get_mac_address(), taskId, '1')
-        #     c_count = c_count + 1
-        #
-        # print report_task(get_mac_address(), taskId, '1')
+        c_count = 1
+        while c_count < count:
+            report_task(get_mac_address(), taskId, '1')
+            c_count = c_count + 1
+
+        print report_task(get_mac_address(), taskId, '1')
     except Exception as e:
         print e
 
@@ -609,14 +609,14 @@ if __name__ == '__main__':
     print clientId
 
 
-    checkTask = check_task(clientId, '3002')
+    checkTask_weibo = check_task(clientId, '3002')['data']
 
-    if checkTask['data'] is None:
+    if checkTask_weibo is None:
         weibo_rid = None
         print '当前没有可执行任务'
 
     else:
-        main()
+        main(checkTask_weibo)
     print "all over %s" % time.ctime()
 
 

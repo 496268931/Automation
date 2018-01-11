@@ -11,9 +11,10 @@ import ZZZautoReview_163
 import ZZZautoReview_qiy
 import ZZZautoReview_sohuVedio
 import ZZZautoReview_youku
-
-reload(sys)
-sys.setdefaultencoding('utf-8')
+import ZZZautoReview_douban
+import appium_test
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 
 def get_mac_address():
     node = uuid.getnode()
@@ -30,7 +31,7 @@ class ClientParam():
     apiURL = 'http://114.215.170.176:4000'
     sleep = 1
     #taskTypes = '111,911,112'
-    taskTypes = '212,612,512,412'
+    taskTypes = '212,412,512,612,712,3000,3001,3002,3003'
     # taskTypes = '911'
 
     routeCheckTask = '/check-task'
@@ -38,7 +39,31 @@ class ClientParam():
 
 
 
+def getHttpIP():
+    i = 0
+    isDaili = 0
+    while i < 6:
+        r = requests.get('http://121.42.227.3:3838/getIp?clientId=123456')
+        res = r.text
 
+        if res != 'null\r\n':
+            print '取到IP'
+
+
+
+            proxies = {"http": "http://" + res.replace('\r\n','')}
+            testRes = requests.get('http://httpbin.org/ip', proxies = proxies)
+
+            if None != testRes.text:
+                print testRes.text
+                isDaili = 1
+                break
+        print '未取到Ip'
+        time.sleep(10)
+        i = i + 1
+
+    print res.replace('\r\n','')
+    return res.replace('\r\n',''), isDaili
 
 '''格瓦拉刷量'''
 def gewaraAttention(task,args):
@@ -164,7 +189,11 @@ def checkTask(args):
         result = requests.get(url=args.apiURL + args.routeCheckTask, params=params).json()
         print(result)
         if result['result']=='ok':
+
+            print('-----参数信息-----')
             print(result['data'])
+            print('-----参数信息-----')
+
             return result['data']
         else:
             return None
@@ -173,7 +202,7 @@ def checkTask(args):
 
 
 
-def reportTask(report, task,args):
+def reportTask(report, task, args):
     params = {
         'clientId':args.clientId,
         'taskId':task['_id'],
@@ -181,8 +210,7 @@ def reportTask(report, task,args):
         # 'message':report['message']
     }
     print(params)
-    result = requests.post(url=args.apiURL + args.routeReportTask,
-                           data=params);
+    result = requests.post(url=args.apiURL + args.routeReportTask, data=params)
     print(result.text)
 
 def runTask(task,args):
@@ -202,7 +230,7 @@ def runTask(task,args):
             'status': 0
         }
 def runTask1(task):
-    print(task)
+    # print(task)
     if (task['type'] != None):
         return autoReview(task)
 
@@ -212,31 +240,66 @@ def runTask1(task):
         }
 def autoReview(task):
     try:
+        if (task['type'] == 212) or (task['type'] == 412) or (task['type'] == 512) or (task['type'] == 612):
+            httpIp, isDaili = getHttpIP()
+    except:
+        print '取IP过程出现BUG'
+
+    try:
         if(task['type'] == 412):
-            ZZZautoReview_youku.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], task['content'])
+            ZZZautoReview_youku.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], ''.join(task['content']), httpIp, isDaili)
 
             return {
                 'status': 1
             }
         elif(task['type'] == 512):
-            ZZZautoReview_qiy.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], task['content'])
+            ZZZautoReview_qiy.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], ''.join(task['content']), httpIp, isDaili)
 
             return {
                 'status': 1
             }
         elif(task['type'] == 612):
-            ZZZautoReview_sohuVedio.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], task['content'])
+            ZZZautoReview_sohuVedio.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], ''.join(task['content']), httpIp, isDaili)
 
             return {
                 'status': 1
             }
         elif(task['type'] == 212):
-            ZZZautoReview_163.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], task['content'])
+            ZZZautoReview_163.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], ''.join(task['content']), httpIp, isDaili)
 
             return {
                 'status': 1
             }
+        elif(task['type'] == 712):
+            ZZZautoReview_douban.main(task)
 
+            return {
+                'status': 1
+            }
+        elif(task['type'] == 3000):
+            appium_test.main(task)
+
+            return {
+                'status': 1
+            }
+        elif(task['type'] == 3001):
+            appium_test.main(task)
+
+            return {
+                'status': 1
+            }
+        elif(task['type'] == 3002):
+            appium_test.main(task)
+
+            return {
+                'status': 1
+            }
+        elif(task['type'] == 3003):
+            appium_test.main(task)
+
+            return {
+                'status': 1
+            }
 
 
 
@@ -264,27 +327,35 @@ def main():
         if task==None:
             continue
 
-        print('-----参数信息-----')
-        print(task['taskUrl'])
-        print(task['content'])
-        print(task['account']['accountId'])
-        # print(task['account']['password'])
-        print('-----参数信息-----')
+        # print('-----参数信息-----')
+        # # print(task['taskUrl'])
+        # # print(task['content'])
+        # # print(task['account']['accountId'])
+        # # print(task['account']['password'])
+        # print task
+        # print('-----参数信息-----')
+
+
         report = runTask1(task)
         #report = runTask(task,args)
-        reportTask(report, task,args)
 
-        time.sleep(float(task['param']['timeInterval']))
+        if (task['type'] == 212) or (task['type'] == 412) or (task['type'] == 512) or (task['type'] == 612):
+            reportTask(report, task, args)
+
+            time.sleep(float(task['param']['timeInterval']))
+
+
+
+        time.sleep(10)
 
         # task =  checkTask(args)
-
         # report = runTask(task)
-
         # reportTask(report,args)
 
 
 
 if __name__ == '__main__':
+
     print('启动')
     main()
 

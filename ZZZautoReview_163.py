@@ -22,7 +22,7 @@ class Param():
 
 
 
-def main(taskUrl, account, password, text):
+def main(taskUrl, account, password, text, httpIp, isDaili):
 
     try:
         #args = Param()
@@ -57,8 +57,19 @@ def main(taskUrl, account, password, text):
         profile.update_preferences()
         driver = webdriver.Firefox(firefox_profile=profile)
         '''
-        driver = webdriver.Firefox()
+        # driver = webdriver.Firefox()
         # driver  = webdriver.Chrome()
+
+
+        ip_ip = httpIp.split(":")[0]
+        ip_port = httpIp.split(":")[1]
+
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('network.proxy.type', isDaili)
+        profile.set_preference('network.proxy.http', ip_ip)
+        profile.set_preference('network.proxy.http_port', ip_port)  # int
+        profile.update_preferences()
+        driver = webdriver.Firefox(firefox_profile=profile)
 
         # driver.get("http://comment.news.163.com/news2_bbs/CPISM0FT000189FH.html")
         driver.get(taskUrl)
@@ -192,7 +203,7 @@ def main(taskUrl, account, password, text):
         print('本次评论任务失败')
         print(e)
     finally:
-        #print(0)
+        print('over')
         driver.quit()
 
 
@@ -203,4 +214,4 @@ if __name__ == '__main__':
     #main('http://comment.news.163.com/news2_bbs/CPMT4G4F0001899N.html', 'i493735', 'aaafff',
     # u'游客飘过~~~~')
     main('http://comment.media.163.com/media_bbs/CR0J7JM100763NKJ.html', 'i493735', 'aaafff',
-         u'冯绍峰好帅啊~~~~')
+         u'冯绍峰好帅啊~~~~', httpIp, isDaili)

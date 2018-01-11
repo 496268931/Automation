@@ -9,6 +9,31 @@ import time
 
 
 
+def getHttpIP():
+    i = 0
+    isDaili = 0
+    while i < 6:
+        r = requests.get('http://121.42.227.3:3838/getIp?clientId=123456')
+        res = r.text
+
+        if res != 'null\r\n':
+            print '取到IP'
+
+
+
+            proxies = {"http": "http://" + res.replace('\r\n','')}
+            testRes = requests.get('http://httpbin.org/ip', proxies = proxies)
+
+            if None != testRes.text:
+                print testRes.text
+                isDaili = 1
+                break
+        print '未取到Ip'
+        time.sleep(10)
+        i = i + 1
+
+    print res.replace('\r\n','')
+    return res.replace('\r\n',''), isDaili
 
 class Param():
     pass
@@ -66,12 +91,12 @@ def getMessage(token, phone, driver):
 
 
     return yanzhengma
-def main(taskUrl, accountId, password, content):
+def main(taskUrl, accountId, password, content, httpIp, isDaili):
     try:
         print('开始本次评论任务')
         # 格式化成2016-03-20 11:45:39形式
         print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-
+        '''
         iplist = ['123.56.154.24:5818', '59.110.159.237:5818', '47.93.113.175:5818',
                   '123.56.44.11:5818', '101.200.76.126:5818', '123.56.228.93:5818',
                   '123.57.48.138:5818', '123.56.72.115:5818', '123.56.77.123:5818',
@@ -90,6 +115,9 @@ def main(taskUrl, accountId, password, content):
         else:
             isDaili = 0
             print(requests.get('http://ip.chinaz.com/getip.aspx').text)
+        '''
+        ip_ip = httpIp.split(":")[0]
+        ip_port = httpIp.split(":")[1]
 
         profile = webdriver.FirefoxProfile()
         profile.set_preference('network.proxy.type', isDaili)
@@ -190,13 +218,14 @@ def main(taskUrl, accountId, password, content):
         print('本次评论任务失败')
         print(e)
     finally:
-        print(1)
-        #driver.quit()
+        print('over')
+        driver.quit()
 
 
 
 
 if __name__ == '__main__':
+    httpIp, isDaili = getHttpIP()
     main('http://v.youku.com/v_show/id_XMTU2ODY2NjYyOA==.html?spm=a2h0j.8191423.module_basic_relation.5~5!2~5~5!24~5~5~A'
-         '~5!2~A', '17190833824', 'abc17190833824', u'太搞笑了')
+         '~5!2~A', '17190833824', 'abc17190833824', u'太搞笑了', httpIp, isDaili)
 

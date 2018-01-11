@@ -1,4 +1,6 @@
 # coding=utf-8
+import uuid
+
 import utf8Togbk
 
 
@@ -54,7 +56,10 @@ logger.addHandler(ch)
                                     time.sleep(2)
 
                             '''
-
+def get_mac_address():
+    node = uuid.getnode()
+    mac = uuid.UUID(int=node).hex[-12:]
+    return mac
 def isElementExist(element, driver):
     flag = True
 
@@ -116,15 +121,15 @@ def report_task(clientId, taskId, status):
 def check_comment_task(clientId, taskTypes):
     pass
 
-def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
-    for xyz in range(1, 401):
+def main(taskInfo, text=u'推荐大家看看', keyword = 2017, pageNum = 1):
+    # for xyz in range(1, 401):
 
         try:
             # 格式化成2016-03-20 11:45:39形式
             print('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             logger.info('本次评论开始时间： '+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-            print xyz
-            logger.info(xyz)
+            # print xyz
+            # logger.info(xyz)
             '''
             iplist = ['123.56.154.24:5818', '59.110.159.237:5818', '47.93.113.175:5818',
                   '123.56.44.11:5818', '101.200.76.126:5818', '123.56.228.93:5818',
@@ -152,14 +157,15 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
             profile.update_preferences()
             driver = webdriver.Firefox(firefox_profile=profile)
             '''
-            info = get_account('豆瓣')
+            accountInfo = get_account('豆瓣')
             print '账号信息: '
             logger.info('账号信息: ')
-            print info
-            logger.info(info)
-            accountId = info['data']['accountId']
-            password = info['data']['password']
-            clientId = info['data']['ipAddress']
+            print accountInfo
+            logger.info(accountInfo)
+            accountId = accountInfo['data']['accountId']
+            password = accountInfo['data']['password']
+            # clientId = accountInfo['data']['ipAddress']
+            clientId = get_mac_address()
             print accountId
             logger.info(accountId)
             print password
@@ -167,7 +173,10 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
             print clientId
             logger.info(clientId)
 
-            checkTask = check_task(clientId, '712')#这里的clientId随便写，但是要有
+
+
+
+            # checkTask = check_task(clientId, '712')#这里的clientId随便写，但是要有
 
             taskId = None
             print taskId
@@ -179,15 +188,20 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
             print timeInterval
             logger.info(timeInterval)
 
-            if checkTask['data'] is None:
+            # if checkTask['data'] is None:
+            if taskInfo is None:
                 taskurl = None
                 print '当前没有可执行任务'
                 logger.info('当前没有可执行任务')
             else:
-                taskurl = checkTask['data']['taskUrl']
-                taskId = checkTask['data']['_id']
-                timeInterval = checkTask['data']['param']['timeInterval']
-                content = checkTask['data']['content']
+                # taskurl = checkTask['data']['taskUrl']
+                # taskId = checkTask['data']['_id']
+                # timeInterval = checkTask['data']['param']['timeInterval']
+                # content = ''.join(checkTask['data']['content'])
+                taskurl = taskInfo['taskUrl']
+                taskId = taskInfo['_id']
+                timeInterval = taskInfo['param']['timeInterval']
+                content = ''.join(taskInfo['content'])
                 print u'本次任务为: ' + taskurl
                 logger.info(u'本次任务为: ' + taskurl)
                 print u'任务ID为: ' +taskId
@@ -366,7 +380,7 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
             #取cookies
             #将json转化成dict
-            json_string = json.dumps(info['data']['data'])
+            json_string = json.dumps(accountInfo['data']['data'])
             get_cookies = json.loads(json_string)
             #print type(cookies) #<type 'dict'>
             print '取到的cookie为: '
@@ -630,4 +644,5 @@ def main(text=u'推荐大家看看', keyword = 2017, pageNum = 1):
 
 
 if __name__ == '__main__':
-    main()
+    taskInfo = check_task('qweqwe', '712')['data']#这里的clientId随便写，但是要有
+    main(taskInfo)

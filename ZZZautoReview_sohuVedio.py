@@ -18,7 +18,7 @@ class Param():
 
 
 
-def main(taskUrl, account, password, text):
+def main(taskUrl, account, password, text, httpIp, isDaili):
     try:
 
         #args = Param()
@@ -28,7 +28,7 @@ def main(taskUrl, account, password, text):
         print('开始本次评论任务')
         # 格式化成2016-03-20 11:45:39形式
         print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-
+        '''
         iplist = ['47.93.113.175:5818', '59.110.159.237:5818', '123.56.77.123:5818',
                   '123.56.76.207:5818', '123.56.72.115:5818', '123.56.154.24:5818',
                   '123.56.44.11:5818', '123.56.228.93:5818', '123.57.48.138:5818',
@@ -46,9 +46,13 @@ def main(taskUrl, account, password, text):
         else:
             i = 0
             print(requests.get('http://ip.chinaz.com/getip.aspx').text)
+        '''
+
+        ip_ip = httpIp.split(":")[0]
+        ip_port = httpIp.split(":")[1]
 
         profile = webdriver.FirefoxProfile()
-        profile.set_preference('network.proxy.type', i)
+        profile.set_preference('network.proxy.type', isDaili)
         profile.set_preference('network.proxy.http', ip_ip)
         profile.set_preference('network.proxy.http_port', ip_port)  # int
         profile.update_preferences()
@@ -175,7 +179,7 @@ def main(taskUrl, account, password, text):
         print('本次评论任务失败')
         print(e)
     finally:
-        #print(0)
+        print('over')
         driver.quit()
 
 
@@ -183,5 +187,5 @@ def main(taskUrl, account, password, text):
 
 
 if __name__ == '__main__':
-    main('http://tv.sohu.com/20170605/n495734949.shtml', '13535754749', 'abc13535754749',
+    main('https://tv.sohu.com/20180108/n600337536.shtml', '13535754749', 'abc13535754749',
          u'看无心全季，就在搜狐视频！追剧表奉上！')
