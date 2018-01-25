@@ -9,31 +9,31 @@ import time
 
 
 
-def getHttpIP():
-    i = 0
-    isDaili = 0
-    while i < 6:
-        r = requests.get('http://121.42.227.3:3838/getIp?clientId=123456')
-        res = r.text
-
-        if res != 'null\r\n':
-            print '取到IP'
-
-
-
-            proxies = {"http": "http://" + res.replace('\r\n','')}
-            testRes = requests.get('http://httpbin.org/ip', proxies = proxies)
-
-            if None != testRes.text:
-                print testRes.text
-                isDaili = 1
-                break
-        print '未取到Ip'
-        time.sleep(10)
-        i = i + 1
-
-    print res.replace('\r\n','')
-    return res.replace('\r\n',''), isDaili
+# def getHttpIP():
+#     i = 0
+#     isDaili = 0
+#     while i < 6:
+#         r = requests.get('http://121.42.227.3:3838/getIp?clientId=123456')
+#         res = r.text
+#
+#         if res != 'null\r\n':
+#             print '取到IP'
+#
+#
+#
+#             proxies = {"http": "http://" + res.replace('\r\n','')}
+#             testRes = requests.get('http://httpbin.org/ip', proxies = proxies)
+#
+#             if None != testRes.text:
+#                 print testRes.text
+#                 isDaili = 1
+#                 break
+#         print '未取到Ip'
+#         time.sleep(10)
+#         i = i + 1
+#
+#     print res.replace('\r\n','')
+#     return res.replace('\r\n',''), isDaili
 
 class Param():
     pass
@@ -91,7 +91,7 @@ def getMessage(token, phone, driver):
 
 
     return yanzhengma
-def main(taskUrl, accountId, password, content, httpIp, isDaili):
+def main(taskUrl, accountId, password, content):
     try:
         print('开始本次评论任务')
         # 格式化成2016-03-20 11:45:39形式
@@ -115,18 +115,18 @@ def main(taskUrl, accountId, password, content, httpIp, isDaili):
         else:
             isDaili = 0
             print(requests.get('http://ip.chinaz.com/getip.aspx').text)
-        '''
+       
         ip_ip = httpIp.split(":")[0]
-        ip_port = httpIp.split(":")[1]
+        ip_port = int(httpIp.split(":")[1])
 
         profile = webdriver.FirefoxProfile()
-        profile.set_preference('network.proxy.type', isDaili)
+        profile.set_preference('network.proxy.type', 0)
         profile.set_preference('network.proxy.http', ip_ip)
         profile.set_preference('network.proxy.http_port', ip_port)  # int
         profile.update_preferences()
         driver = webdriver.Firefox(firefox_profile=profile)
-
-        #driver = webdriver.Firefox()
+         '''
+        driver = webdriver.Firefox()
         #args = Param()
         # driver  = webdriver.Chrome()
 
@@ -225,7 +225,7 @@ def main(taskUrl, accountId, password, content, httpIp, isDaili):
 
 
 if __name__ == '__main__':
-    httpIp, isDaili = getHttpIP()
+    # httpIp, isDaili = getHttpIP()
     main('http://v.youku.com/v_show/id_XMTU2ODY2NjYyOA==.html?spm=a2h0j.8191423.module_basic_relation.5~5!2~5~5!24~5~5~A'
-         '~5!2~A', '17190833824', 'abc17190833824', u'太搞笑了', httpIp, isDaili)
+         '~5!2~A', '17190833824', 'abc17190833824', u'太搞笑了')
 

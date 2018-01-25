@@ -18,7 +18,7 @@ class Param():
 
 
 
-def main(taskUrl, account, password, text, httpIp, isDaili):
+def main(taskUrl, account, password, text):
     try:
 
         #args = Param()
@@ -46,10 +46,10 @@ def main(taskUrl, account, password, text, httpIp, isDaili):
         else:
             i = 0
             print(requests.get('http://ip.chinaz.com/getip.aspx').text)
-        '''
+        
 
         ip_ip = httpIp.split(":")[0]
-        ip_port = httpIp.split(":")[1]
+        ip_port = int(httpIp.split(":")[1])
 
         profile = webdriver.FirefoxProfile()
         profile.set_preference('network.proxy.type', isDaili)
@@ -57,10 +57,10 @@ def main(taskUrl, account, password, text, httpIp, isDaili):
         profile.set_preference('network.proxy.http_port', ip_port)  # int
         profile.update_preferences()
         driver = webdriver.Firefox(firefox_profile=profile)
+        '''
 
 
-
-        #driver = webdriver.Firefox()
+        driver = webdriver.Firefox()
         driver.get(taskUrl)
         driver.maximize_window()
         time.sleep(2)

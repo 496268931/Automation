@@ -18,7 +18,7 @@ class Param():
     pass
 
 
-def main(taskUrl, accountId, password, content, httpIp, isDaili):
+def main(taskUrl, accountId, password, content):
     try:
         print('开始本次评论任务')
         # 格式化成2016-03-20 11:45:39形式
@@ -42,22 +42,22 @@ def main(taskUrl, accountId, password, content, httpIp, isDaili):
         else:
             isDaili = 0
             print(requests.get('http://ip.chinaz.com/getip.aspx').text)
-        '''
+        
 
 
 
         ip_ip = httpIp.split(":")[0]
-        ip_port = httpIp.split(":")[1]
+        ip_port = int(httpIp.split(":")[1])
 
 
         profile = webdriver.FirefoxProfile()
-        profile.set_preference('network.proxy.type', isDaili)
+        profile.set_preference('network.proxy.type', 0)
         profile.set_preference('network.proxy.http', ip_ip)
         profile.set_preference('network.proxy.http_port', ip_port)  # int
         profile.update_preferences()
         driver = webdriver.Firefox(firefox_profile=profile)
-
-        # driver = webdriver.Firefox()
+        '''
+        driver = webdriver.Firefox()
         # args = Param()
         # driver  = webdriver.Chrome()
         # driver.get("http://www.iqiyi.com/v_19rr80hvpc.html#vfrm=24-9-0-1")

@@ -39,31 +39,32 @@ class ClientParam():
 
 
 
-def getHttpIP():
-    i = 0
-    isDaili = 0
-    while i < 6:
-        r = requests.get('http://121.42.227.3:3838/getIp?clientId=123456')
-        res = r.text
-
-        if res != 'null\r\n':
-            print '取到IP'
-
-
-
-            proxies = {"http": "http://" + res.replace('\r\n','')}
-            testRes = requests.get('http://httpbin.org/ip', proxies = proxies)
-
-            if None != testRes.text:
-                print testRes.text
-                isDaili = 1
-                break
-        print '未取到Ip'
-        time.sleep(10)
-        i = i + 1
-
-    print res.replace('\r\n','')
-    return res.replace('\r\n',''), isDaili
+# def getHttpIP():
+#     # 2018年1月25日  该方法不再可用
+#     i = 0
+#     isDaili = 0
+#     while i < 6:
+#         r = requests.get('http://121.42.227.3:3838/getIp?clientId=123456')
+#         res = r.text
+#
+#         if res != 'null\r\n':
+#             print '取到IP'
+#
+#
+#
+#             proxies = {"http": "http://" + res.replace('\r\n','')}
+#             testRes = requests.get('http://httpbin.org/ip', proxies = proxies)
+#
+#             if None != testRes.text:
+#                 print testRes.text
+#                 isDaili = 1
+#                 break
+#         print '未取到Ip'
+#         time.sleep(10)
+#         i = i + 1
+#
+#     print res.replace('\r\n','')
+#     return res.replace('\r\n',''), isDaili
 
 '''格瓦拉刷量'''
 def gewaraAttention(task,args):
@@ -241,31 +242,32 @@ def runTask1(task):
 def autoReview(task):
     try:
         if (task['type'] == 212) or (task['type'] == 412) or (task['type'] == 512) or (task['type'] == 612):
-            httpIp, isDaili = getHttpIP()
+            # httpIp, isDaili = getHttpIP()
+            pass
     except:
         print '取IP过程出现BUG'
 
     try:
         if(task['type'] == 412):
-            ZZZautoReview_youku.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], ''.join(task['content']), httpIp, isDaili)
+            ZZZautoReview_youku.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], ''.join(task['content']))
 
             return {
                 'status': 1
             }
         elif(task['type'] == 512):
-            ZZZautoReview_qiy.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], ''.join(task['content']), httpIp, isDaili)
+            ZZZautoReview_qiy.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], ''.join(task['content']))
 
             return {
                 'status': 1
             }
         elif(task['type'] == 612):
-            ZZZautoReview_sohuVedio.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], ''.join(task['content']), httpIp, isDaili)
+            ZZZautoReview_sohuVedio.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], ''.join(task['content']))
 
             return {
                 'status': 1
             }
         elif(task['type'] == 212):
-            ZZZautoReview_163.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], ''.join(task['content']), httpIp, isDaili)
+            ZZZautoReview_163.main(task['taskUrl'], task['account']['accountId'], task['account']['password'], ''.join(task['content']))
 
             return {
                 'status': 1
